@@ -1,6 +1,6 @@
 /* Courses data + UI interactions (mirrors store.js behavior) */
 const products = [
-    {id:1,name:'Complete AI Agent Practical Course',price: FREE,category:'beginner',desc:'Foundations of web application security with hands-on labs.',img:'assets/store/course-web-hacking.svg', amazonUrl:'https://example.com/courses/intro-web'},
+    {id:1,name:'AI Agent Practical Course',price: FREE,category:'beginner',desc:'Foundations of web application security with hands-on labs.',img:'assets/store/course-web-hacking.svg', amazonUrl:'https://example.com/courses/intro-web'},
     {id:2,name:'Network Pentesting Lab',price:99.00,category:'intermediate',desc:'Practical network pentesting with lab exercises and exploits.',img:'assets/store/course-network-lab.svg', amazonUrl:'https://example.com/courses/network-lab'},
     {id:3,name:'Payloads & Exploitation',price:79.00,category:'intermediate',desc:'Crafting payloads, exploit development basics and mitigation bypasses.',img:'assets/store/course-payloads.svg', amazonUrl:'https://example.com/courses/payloads'},
     {id:4,name:'Hardware Hacking Basics',price:59.00,category:'beginner',desc:'Intro to hardware hacking: GPIO, serial, and firmware analysis.',img:'assets/store/course-hardware.svg', amazonUrl:'https://example.com/courses/hardware'},
