@@ -3,7 +3,7 @@
 
 const products = [
     {id:1,name:'AI Agent Practical Course',price: 0,category:'beginner',desc:'Foundations of web application security with hands-on labs.',img:'assets/store/course-web-hacking.svg', amazonUrl:'https://example.com/courses/intro-web'},
-    {id:2,name:'Pentesting Lab',price:99.00,category:'intermediate',desc:'Practical network pentesting with lab exercises and exploits.',img:'assets/store/course-network-lab.svg', amazonUrl:'https://example.com/courses/network-lab'},
+    {id:2,name:'Pentesting',price:99.00,category:'intermediate',desc:'Practical network pentesting with lab exercises and exploits.',img:'assets/store/course-network-lab.svg', amazonUrl:'https://example.com/courses/network-lab'},
     {id:3,name:'Payloads & Exploitation',price:79.00,category:'intermediate',desc:'Crafting payloads, exploit development basics and mitigation bypasses.',img:'assets/store/course-payloads.svg', amazonUrl:'https://example.com/courses/payloads'},
     {id:4,name:'Hacking Basics',price:59.00,category:'beginner',desc:'Intro to hardware hacking: GPIO, serial, and firmware analysis.',img:'assets/store/course-hardware.svg', amazonUrl:'https://example.com/courses/hardware'},
     {id:5,name:'Advanced Red Team Ops',price:249.00,category:'advanced',desc:'Adversary simulation, persistence, lateral movement and OPSEC.',img:'assets/store/course-red-team.svg', amazonUrl:'https://example.com/courses/red-team'},

@@ -11,7 +11,7 @@ const products = [
   },
   {
     id: 2,
-    name: "Ethically Hack the Planet – Part 4",
+    name: "Ethically Hack – Part 4",
     price: 0,
     category: "cybersecurity",
     desc: "52m • ⭐ 3.95 • 51,250 students",
