@@ -1,4 +1,6 @@
 /* Courses data + UI interactions (mirrors store.js behavior) */
+console.log("COURSES JS UPDATED LIVE");
+
 const products = [
     {id:1,name:'AI Agent Practical Course',price: FREE,category:'beginner',desc:'Foundations of web application security with hands-on labs.',img:'assets/store/course-web-hacking.svg', amazonUrl:'https://example.com/courses/intro-web'},
     {id:2,name:'Pentesting Lab',price:99.00,category:'intermediate',desc:'Practical network pentesting with lab exercises and exploits.',img:'assets/store/course-network-lab.svg', amazonUrl:'https://example.com/courses/network-lab'},
