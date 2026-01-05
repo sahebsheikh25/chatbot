@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
-  <rect width="100%" height="100%" fill="#071023" rx="12"/>
-  <rect x="14" y="34" width="212" height="92" fill="rgba(0,255,178,0.06)" stroke="#00FFB2" stroke-opacity="0.25" rx="8"/>
-  <g font-family="Orbitron, sans-serif" fill="#7FDBFF" font-size="18" text-anchor="middle">
-    <text x="120" y="72">Cyberdeck</text>
-    <text x="120" y="96" fill="#00FFB2" font-size="14">Mini</text>
-  </g>
-</svg>
