@@ -2,7 +2,7 @@
 const products = [
   {
     id: 1,
-    name: "Complete AI Agent Practical Course",
+    name: "AI Agent Practical Course",
     price: 0,
     category: "ai",
     desc: "7h 46m • ⭐ 4.97 • 1638 students",
