@@ -73,7 +73,7 @@ const products = [
     amazonUrl: "https://www.udemy.com/course/fundamentals-of-cloud-computing-a/?couponCode=265C6B1DF107AB8B0F71"
   },
   {
-    id: 9,
+    id: 10,
     name: "Mastering Kali Linux for Ethical Hackers",
     price: 0,
     category: "cybersecurity",
@@ -82,7 +82,7 @@ const products = [
     amazonUrl: "https://www.udemy.com/course/mastering-kali-linux-for-ethical-hackers/?couponCode=D7DB2033853077A62219"
   },
   {
-    id: 10,
+    id: 11,
     name: "Complete Python Bootcamp",
     price: 0,
     category: "python",
@@ -91,7 +91,7 @@ const products = [
     amazonUrl: "https://www.udemy.com/course/the-complete-python-bootcamp-from-zero-to-expert/?couponCode=AE3667B2EEADEFEAB7D2"
   },
 {
-  id:9,
+  id:12,
   name:'AI in HR – Master 100+ AI Tools',
   price:0,
   category:'beginner',
@@ -100,7 +100,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/ai-hr-become-master-of-ai-in-hr-world-learn-100-ai-tools/?couponCode=PAPAHR_JAN_03'
 },
 {
-  id:10,
+  id:13,
   name:'Professional Diploma in Branding',
   price:0,
   category:'beginner',
@@ -109,7 +109,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/professional-diploma-in-branding-and-brand-management/?couponCode=3CFA01CC7E83825998A5'
 },
 {
-  id:11,
+  id:14,
   name:'ETABS From Zero to Hero',
   price:0,
   category:'intermediate',
@@ -118,7 +118,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/etabs-from-zero-to-hero/?couponCode=AFF4FFE3E6BFD09CD993'
 },
 {
-  id:12,
+  id:15,
   name:'Python Development – First Steps',
   price:0,
   category:'beginner',
@@ -127,7 +127,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/python-development-first-steps-and-development-ide-platform/?couponCode=645A7E2B0A39083F062E'
 },
 {
-  id:13,
+  id:16,
   name:'AI Cyber Security Mastery',
   price:0,
   category:'advanced',
@@ -136,7 +136,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/ai-cyber-security-mastery/?couponCode=D242CEBFF78671B71FA1'
 },
 {
-  id:14,
+  id:17,
   name:'AutoCAD 2D Complete Course',
   price:0,
   category:'beginner',
@@ -145,7 +145,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/learn-autocad-2d/?couponCode=37E398B0419B8D2816DF'
 },
 {
-  id:15,
+  id:18,
   name:'Become Expert in Python by Projects',
   price:0,
   category:'intermediate',
@@ -154,7 +154,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/become-experts-in-python-by-exercises-by-projects/?couponCode=4561FE1C0FB347A1471E'
 },
 {
-  id:16,
+  id:19,
   name:'PHP & MySQL – Build Travel Website',
   price:0,
   category:'intermediate',
@@ -163,7 +163,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/php-with-mysql-2023-build-complete-tours-and-travel-website/?couponCode=PHPTOURS59'
 },
 {
-  id:17,
+  id:20,
   name:'Machine Learning Foundations',
   price:0,
   category:'advanced',
@@ -172,7 +172,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/machine-learning-foundations-build-expert-level-ai-models/?couponCode=1EBC7A3AF2ECC74B225C'
 },
 {
-  id:18,
+  id:21,
   name:'Ultimate Coding Mega Course',
   price:0,
   category:'beginner',
@@ -181,7 +181,7 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/top-course/?couponCode=E2BF09F1EEAED022FC7A'
 },
 {
-  id:19,
+  id:22,
   name:'Business English for Leadership',
   price:0,
   category:'beginner',
@@ -190,14 +190,60 @@ const products = [
   amazonUrl:'https://www.udemy.com/course/business-english-for-management-and-leadership/?couponCode=F5E62CFFC2996E47407F'
 },
 {
-  id:20,
+  id:23,
   name:'JavaScript Bootcamp – 11 Apps',
   price:0,
   category:'intermediate',
   desc:'⭐ Build 11 JS apps (web)',
   img:'assets/store/course-js.svg',
   amazonUrl:'https://www.udemy.com/course/build-11-javascript-application-and-web-javascript-bootcamp/?couponCode=EDD7CD82F922864A4A81'
+},
+{
+  id: 24,
+  name: "ABC of Ear, Nose and Throat (ENT) Disorders",
+  price: 0,
+  category: "health",
+  desc: "Detailed ENT disorders course • Free Udemy coupon",
+  img: "assets/store/udemy-health.svg",
+  amazonUrl: "https://www.udemy.com/course/abc-of-ear-nose-and-throat-ent-disorders/?couponCode=91F40117EC0C1BE7806F"
+},
+{
+  id: 25,
+  name: "General Bacteriology – A Concise Course",
+  price: 0,
+  category: "health",
+  desc: "Bacteriology fundamentals • Free Udemy coupon",
+  img: "assets/store/udemy-health.svg",
+  amazonUrl: "https://www.udemy.com/course/general-bacteriology-a-concise-course/?couponCode=6687D9F5452887962F23"
+},
+{
+  id: 26,
+  name: "Web Hacking for Beginners",
+  price: 0,
+  category: "cybersecurity",
+  desc: "Intro to ethical hacking and web security • Free Udemy coupon",
+  img: "assets/store/udemy-hacking.svg",
+  amazonUrl: "https://www.udemy.com/course/web-hacking-for-beginners/?couponCode=D1EF67C09FC14339A85A"
+},
+{
+  id: 27,
+  name: "Beginner’s Guide to Bash Scripting & Automation",
+  price: 0,
+  category: "coding",
+  desc: "Learn Bash scripting basics • Free Udemy coupon",
+  img: "assets/store/udemy-coding.svg",
+  amazonUrl: "https://www.udemy.com/course/the-beginners-guide-to-bash-scripting-and-automation/?couponCode=A94B59B1CEA833CD2B96"
+},
+{
+  id: 28,
+  name: "SQLMap From Scratch for Ethical Hackers",
+  price: 0,
+  category: "cybersecurity",
+  desc: "Hands-on SQLMap for pentesting • Free Udemy coupon",
+  img: "assets/store/udemy-hacking.svg",
+  amazonUrl: "https://www.udemy.com/course/sqlmap-from-scratch-for-ethical-hackers/?couponCode=012C7BE7904C05349B4A"
 }
+
 
 ];
 
