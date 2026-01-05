@@ -276,28 +276,31 @@ function renderProducts(){
     }
 
     filtered.forEach(p => {
-        const card = document.createElement('article');
-        card.className = 'card';
-        card.innerHTML = `
-            <div class="card-media"><img loading="lazy" src="${p.img}" alt="${p.name}"></div>
-            <div>
-                <h3>${p.name}</h3>
-                <div class="muted">${p.desc}</div>
+      const card = document.createElement('article');
+      card.className = 'card';
+      const isFree = (p.price === 0);
+      const buyLabel = isFree ? 'Free' : 'Enroll';
+      const buyClass = isFree ? 'btn neon free buy' : 'btn neon buy';
+      card.innerHTML = `
+        <div class="card-media"><img loading="lazy" src="${p.img}" alt="${p.name}"></div>
+        <div>
+          <h3>${p.name}</h3>
+          <div class="muted">${p.desc}</div>
+        </div>
+        <div class="card-footer">
+          <div>
+            <div class="label">${p.category.toUpperCase()}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="price">${formatPrice(p.price)}</div>
+            <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
+              <button class="btn ghost details" data-id="${p.id}">Details</button>
+              <button class="${buyClass}" data-id="${p.id}" data-amazon="${p.amazonUrl}">${buyLabel}</button>
             </div>
-            <div class="card-footer">
-                <div>
-                    <div class="label">${p.category.toUpperCase()}</div>
-                </div>
-                <div style="text-align:right">
-                    <div class="price">${formatPrice(p.price)}</div>
-                    <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
-                        <button class="btn ghost details" data-id="${p.id}">Details</button>
-                        <button class="btn neon buy" data-id="${p.id}" data-amazon="${p.amazonUrl}">Enroll</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        productGrid.appendChild(card);
+          </div>
+        </div>
+      `;
+      productGrid.appendChild(card);
     });
 
     document.querySelectorAll('.details').forEach(btn => btn.addEventListener('click', e => openModal(Number(e.currentTarget.dataset.id))));

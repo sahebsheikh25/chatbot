@@ -398,11 +398,54 @@ body {
     background: rgba(0, 255, 178, 0.1);
     box-shadow: 0 0 20px var(--glow-color);
     transform: translate3d(0,-2px,0);
+}
+
+/* Support classes used in markup: .btn.ghost, .btn.neon, .btn.free */
+.btn.ghost, .btn-ghost {
+    background: transparent;
+    color: var(--accent-primary);
+    border: 2px solid rgba(255,255,255,0.04);
+    padding: 10px 14px;
+    border-radius: 8px;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.18s ease, box-shadow 0.25s ease;
+}
+
+.btn.ghost:hover, .btn-ghost:hover {
+    background: rgba(0,255,178,0.06);
+    color: var(--accent-secondary);
+    box-shadow: 0 0 18px var(--glow-color);
+    transform: translateY(-3px);
+}
+
+.btn.neon {
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    color: var(--bg-primary);
+    box-shadow: 0 0 18px var(--glow-color);
+    border: 2px solid rgba(0,255,178,0.12);
+}
+
+.btn.neon:hover {
+    background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
+    box-shadow: 0 0 30px var(--glow-color), 0 0 60px var(--glow-color);
+    transform: translateY(-3px);
+}
+
+.btn.free {
+    background: rgba(0,255,178,0.06);
+    color: var(--accent-primary);
+    border: 2px solid rgba(0,255,178,0.12);
+}
+
+.btn.free:hover {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    box-shadow: 0 0 24px var(--glow-color);
+    transform: translateY(-3px);
+}
 
 /* Hint to browser these will be animated (composited) */
 .btn, .nav-toggle span, .hero-image {
     will-change: transform, opacity;
-}
 }
 
 .btn-large {
