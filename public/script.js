@@ -301,3 +301,26 @@ document.addEventListener('DOMContentLoaded', function () {
         else card.appendChild(actions);
     });
 });
+// ===============================
+// MOBILE NAVBAR FIX (ALL PAGES)
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("navToggle");
+  const menu = document.getElementById("navMenu");
+
+  if (!toggle || !menu) return;
+
+  toggle.addEventListener("click", () => {
+    menu.classList.toggle("active");
+    toggle.classList.toggle("active");
+  });
+
+  // Auto close on link click (mobile UX)
+  menu.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+      menu.classList.remove("active");
+      toggle.classList.remove("active");
+    });
+  });
+});
+

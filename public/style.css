@@ -1116,3 +1116,40 @@ main.container { padding: 48px 20px; }
       drop-shadow(0 0 10px rgba(0,255,178,0.8))
       brightness(1.4);
 }
+/* ===============================
+   MOBILE NAV MENU – GLOBAL FIX
+================================ */
+@media (max-width: 900px) {
+
+  .nav-toggle {
+    display: block;
+    cursor: pointer;
+    z-index: 10001;
+  }
+
+  .nav-menu {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 64px);
+    background: linear-gradient(180deg, #050b14, #02060d);
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    z-index: 10000;
+    overflow-y: auto;
+  }
+
+  .nav-menu.active {
+    display: flex;
+  }
+
+  .nav-menu li {
+    margin: 12px 0;
+  }
+
+  .nav-link {
+    font-size: 1.1rem;
+  }
+}
