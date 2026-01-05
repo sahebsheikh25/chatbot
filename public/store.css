@@ -68,7 +68,12 @@ body{
 .product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:18px}
 .card{background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0.04));border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;transition:transform .28s ease, box-shadow .28s ease;border:1px solid rgba(0,255,178,0.04);backdrop-filter: blur(6px);  position: relative;   /* ✅ ADD THIS */
   overflow: hidden;     /* ✅ ADD THIS */}
-.card:hover{transform:translateY(-10px) scale(1.01);box-shadow:0 22px 60px rgba(0,255,178,0.08), 0 0 60px rgba(0,242,255,0.06) inset}
+.card:hover{
+  transform:scale(1.01);   /* ❌ translateY hata diya */
+  z-index:1;               /* ✅ hover card upar rahe */
+  box-shadow:0 22px 60px rgba(0,255,178,0.08),
+             0 0 60px rgba(0,242,255,0.06) inset;
+}
 .card-media{height:160px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#001820,#053246);display:flex;align-items:center;justify-content:center;border:1px solid rgba(127,219,255,0.03)}
 .card-media img{max-width:90%;max-height:90%;object-fit:contain;transform:scale(.98);transition:transform .4s}
 .card:hover .card-media img{transform:scale(1.06)}
