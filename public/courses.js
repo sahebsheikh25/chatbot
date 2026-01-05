@@ -6,7 +6,7 @@ const products = [
     price: 0,
     category: "ai",
     desc: "7h 46m • ⭐ 4.97 • 1638 students",
-    img: "/assets/images/courses/ai.png",
+    img: "/assets/images/courses/ai.webp",
     amazonUrl: "https://www.udemy.com/course/complete-ai-agent-practical-course-c-aipc/?couponCode=NEW_YEAR_2026"
   },
   {
