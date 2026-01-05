@@ -16,6 +16,8 @@ body{
     background: radial-gradient(1200px 600px at 10% 10%, rgba(0,255,178,0.04), transparent), linear-gradient(180deg,var(--bg-1),var(--bg-2));
     color:#e6f7ff;
     -webkit-font-smoothing:antialiased;
+     padding-top:90px;   /* ✅ YAHI ADD KARNA HAI */
+
 }
 
 .container{max-width:1200px;margin:0 auto;padding:24px}
@@ -64,7 +66,8 @@ body{
 .filter-btn.active{border-color:var(--accent);box-shadow:0 6px 28px rgba(0,255,178,0.06);color:var(--accent);background:linear-gradient(180deg,rgba(0,255,178,0.02),transparent)}
 
 .product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:18px}
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0.04));border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;transition:transform .28s ease, box-shadow .28s ease;border:1px solid rgba(0,255,178,0.04);backdrop-filter: blur(6px)}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0.04));border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;transition:transform .28s ease, box-shadow .28s ease;border:1px solid rgba(0,255,178,0.04);backdrop-filter: blur(6px);  position: relative;   /* ✅ ADD THIS */
+  overflow: hidden;     /* ✅ ADD THIS */}
 .card:hover{transform:translateY(-10px) scale(1.01);box-shadow:0 22px 60px rgba(0,255,178,0.08), 0 0 60px rgba(0,242,255,0.06) inset}
 .card-media{height:160px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#001820,#053246);display:flex;align-items:center;justify-content:center;border:1px solid rgba(127,219,255,0.03)}
 .card-media img{max-width:90%;max-height:90%;object-fit:contain;transform:scale(.98);transition:transform .4s}
@@ -73,7 +76,7 @@ body{
 .price{font-weight:900;color:var(--accent);letter-spacing:0.6px}
 .muted{color:var(--muted);font-size:0.9rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
-.card-footer{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-footer{display:flex;justify-content:space-between;align-items:center;gap:8px; margin-top:auto;   /* ✅ ADD THIS LINE */}
 .btn{padding:8px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:700}
 .btn.neon{background:linear-gradient(90deg,var(--neon),var(--accent));color:#001217;box-shadow:0 10px 40px rgba(0,255,178,0.14);padding:10px 14px}
 .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 12px}
@@ -137,7 +140,7 @@ body{
     .card{padding:12px}
     .card h3{font-size:0.98rem}
     .card-footer{flex-direction:column;align-items:flex-start;gap:10px}
-    .card-footer > div[style]{width:100%;text-align:left}
+    .card-footer  div[style]{width:100%;text-align:left}
     .card-footer .price{font-size:1rem}
     .card-footer .btn{width:48%;padding:8px}
     .card-footer .btn.neon{width:48%}
@@ -153,16 +156,4 @@ body{
     .card-footer .btn.neon{width:100%}
     .store-brand h1{font-size:0.95rem}
 }
-/* ===== FINAL NAVBAR GAP FIX ===== */
 
-/* Desktop */
-.store-header{
-  margin-top:90px !important;
-}
-
-/* Mobile */
-@media (max-width:768px){
-  .store-header{
-    margin-top:75px !important;
-  }
-}

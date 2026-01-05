@@ -528,7 +528,8 @@ section {
 
 .contact-form label { color: var(--text-secondary); font-size: 0.9rem; }
 
-.card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; }
+.card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; position: relative;
+  overflow: hidden;}
 
 .btn-ghost { background: transparent; color: var(--accent-primary); border: 1px solid rgba(255,255,255,0.04); padding:10px 14px; border-radius:8px; }
 
