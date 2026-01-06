@@ -50,19 +50,56 @@ export default async function handler(req, res) {
     if (process.env.SITE_URL) headers.Referer = process.env.SITE_URL;
     if (process.env.SITE_TITLE) headers['X-Title'] = process.env.SITE_TITLE;
 
-    // Use a timeout to avoid long hangs
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    // Try multiple OpenRouter endpoints with a small retry/backoff for robustness
+    const endpoints = [
+      'https://api.openrouter.ai/v1/chat/completions',
+      'https://openrouter.ai/api/v1/chat/completions'
+    ];
+    let lastErr = null;
+    let r = null;
+    let text = '';
 
-    const r = await fetch('https://api.openrouter.ai/v1/chat/completions', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
+    for (let i = 0; i < endpoints.length; i++) {
+      const url = endpoints[i];
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
 
-    const text = await r.text();
+        // include Accept and a minimal User-Agent for some hosts
+        const reqHeaders = Object.assign({ Accept: 'application/json', 'User-Agent': 'snsecurity-chatbot/1.0' }, headers);
+
+        r = await fetch(url, {
+          method: 'POST',
+          headers: reqHeaders,
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeout);
+        text = await r.text();
+        // parse and break if we got a response (even non-OK we'll handle below)
+        break;
+      } catch (e) {
+        lastErr = e;
+        console.error(`OpenRouter request to ${url} failed:`, e && e.message ? e.message : e);
+        // small backoff before next try
+        await new Promise((res) => setTimeout(res, 250 + i * 150));
+      }
+    }
+
+    // If we never got a response object, fail
+    if (!r) {
+      const errMsg = lastErr && lastErr.name === 'AbortError' ? 'Request timed out to AI backend.' : (lastErr && lastErr.message ? lastErr.message : 'fetch failed');
+      console.error('All OpenRouter endpoints failed:', errMsg);
+      return res.status(502).json({ error: `System: ${errMsg}` });
+    }
+
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      // not JSON
+    }
     let json;
     try {
       json = JSON.parse(text);
