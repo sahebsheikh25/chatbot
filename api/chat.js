@@ -1,22 +1,15 @@
-// /api/chat.js
+// /api/chat.js — SN Security (stable + fallback)
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(200).json({
-      info: 'POST JSON { messages: [...] }'
-    });
+    return res.status(200).json({ info: 'POST JSON { messages: [...] }' });
   }
 
-  /* ---------- Parse body safely (Edge + Node) ---------- */
+  /* ---------- Parse body (Edge + Node safe) ---------- */
   let body = {};
   try {
-    if (typeof req.json === 'function') {
-      body = await req.json();
-    } else if (req.body) {
-      body = req.body;
-    }
-  } catch (e) {
-    body = {};
-  }
+    if (typeof req.json === 'function') body = await req.json();
+    else if (req.body) body = req.body;
+  } catch {}
 
   const incoming = Array.isArray(body.messages)
     ? body.messages
@@ -24,12 +17,12 @@ export default async function handler(req, res) {
     ? [{ role: 'user', content: String(body.message) }]
     : [];
 
-  const recent = incoming.slice(-8); // keep context light
+  const recent = incoming.slice(-8);
 
   const system = {
     role: 'system',
     content:
-      'You are SN Security, a cybersecurity assistant with a hacker-terminal tone. Focus on ethical hacking, defensive security, awareness, and safe explanations. Never provide illegal instructions.'
+      'You are SN Security, a hacker-style cybersecurity assistant. Focus on ethical hacking, defensive security, awareness, and safe explanations. Never provide illegal instructions.'
   };
 
   const messages = [system, ...recent];
@@ -41,9 +34,12 @@ export default async function handler(req, res) {
     });
   }
 
-  /* ---------- Model fallback list (most stable → least) ---------- */
+  /* ---------- MODEL PRIORITY (TOP → FALLBACK) ---------- */
   const MODELS = [
-    'xiaomi/mimo-v2-flash:free',
+    // ✅ STABLE (PAID – highly recommended)
+    'openai/gpt-4o-mini',
+
+    // ⚠️ FREE (unstable – backup only)
     'meta-llama/llama-3-8b-instruct:free',
     'mistralai/devstral-2512:free'
   ];
@@ -59,7 +55,6 @@ export default async function handler(req, res) {
   if (process.env.SITE_TITLE) headers['X-Title'] = process.env.SITE_TITLE;
 
   const endpoint = 'https://api.openrouter.ai/v1/chat/completions';
-
   let lastError = null;
 
   /* ---------- Try models one by one ---------- */

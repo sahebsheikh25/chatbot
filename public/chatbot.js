@@ -23,26 +23,94 @@
   }
 
   function revealText(el, text){
-    // simple typewriter reveal
-    el.textContent = '';
-    let i = 0;
-    function step(){
-      i += 1;
-      el.textContent = text.slice(0, i);
-      if(i < text.length) requestAnimationFrame(step);
-      else el.classList.add('show');
-    }
-    requestAnimationFrame(step);
-  }
-
-  function renderMessages(){
-    messagesEl.innerHTML = '';
-    messages.forEach((m, idx)=>{
+    // simple typewriter reveal that returns a Promise resolved when done
+    return new Promise((resolve) => {
+      try{
+        el.textContent = '';
+        // create blinking cursor
+        const cursor = document.createElement('span');
+        cursor.textContent = '_';
+        cursor.style.marginLeft = '6px';
+        cursor.style.color = getComputedStyle(document.documentElement).getPropertyValue('--neon-green') || 'lime';
+        cursor.style.animation = 'blink 1s steps(2) infinite';
+        let i = 0;
+        function step(){
+          i += 1;
+          el.textContent = text.slice(0, i);
+          scrollToBottom();
+          if(i < text.length) requestAnimationFrame(step);
+          else {
+            el.classList.add('show');
+            // attach blinking cursor
+            return new Promise((resolve)=>{
+              el.textContent = '';
+              let i = 0;
+              const cursor = document.createElement('span'); cursor.className = 'typing-cursor'; cursor.textContent = '_';
+              el.appendChild(cursor);
+              const step = ()=>{
+                if(i < text.length){
+                  cursor.insertAdjacentText('beforebegin', text.charAt(i));
+                  i++;
+                  scrollToBottom();
+                  setTimeout(step, speed + Math.random()*10);
+                } else {
+                  // blink cursor a couple times then resolve
+                  let blinks = 0;
+                  const blinkI = setInterval(()=>{
+                    cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+                    blinks++;
+                    if(blinks > 4){
+                      clearInterval(blinkI);
+                      cursor.remove();
+                      resolve();
+                    }
+                  }, 120);
+                }
+              };
+              step();
+            });
       const d = document.createElement('div');
+
+          // Hacker-style boot/welcome sequence (session-only)
+          async function runWelcomeSequence(){
+            try{
+              if(sessionStorage.getItem('sn_welcome_shown')) return;
+              // Keep non-blocking: we'll append transient system messages that use revealText
+              const lines = [];
+              const hour = new Date().getHours();
+              let greeting = 'Good evening';
+              if(hour >= 5 && hour < 12) greeting = 'Good morning';
+              else if(hour >= 12 && hour < 17) greeting = 'Good afternoon';
+              else if(hour >= 17 && hour < 21) greeting = 'Good evening';
+              else greeting = 'Good night';
+
+              lines.push('snsecurity@terminal:~$ initializing secure channel...');
+              lines.push('snsecurity@terminal:~$ access granted \u2714');
+              lines.push(`snsecurity@terminal:~$ ${greeting}, operative.`);
+              lines.push('snsecurity@terminal:~$ secure channel established.');
+
+              for(const ln of lines){
+                // create a temporary bot-like message element with terminal prefix
+                const d = document.createElement('div'); d.className = 'sn-msg bot revealing';
+                const pfx = document.createElement('span'); pfx.className = 'terminal-prefix'; pfx.textContent = '>';
+                const text = document.createElement('span'); text.className = 'terminal-text';
+                d.appendChild(pfx); d.appendChild(text);
+                messagesEl.appendChild(d);
+                scrollToBottom();
+                await revealText(text, ln, 16);
+                d.classList.remove('revealing');
+                await new Promise(r=>setTimeout(r, 220 + Math.random()*240));
+              }
+
+              sessionStorage.setItem('sn_welcome_shown', '1');
+            }catch(e){
+              console.error('welcome seq error', e);
+            }
+          }
       d.className = 'sn-msg ' + (m.role === 'system' ? 'system' : (m.role === 'user' ? 'user' : 'bot'));
 
       if(m.role === 'bot'){
-        const pfx = document.createElement('span'); pfx.className = 'terminal-prefix'; pfx.textContent = '>';
+        const pfx = document.createElement('span'); pfx.className = 'terminal-prefix'; pfx.textContent = (m.prefix || '>');
         const text = document.createElement('span'); text.className = 'terminal-text';
         // if last message, animate reveal slightly
         if(idx === messages.length - 1){
@@ -52,7 +120,7 @@
           d.appendChild(text);
           messagesEl.appendChild(d);
           // small delay to allow layout
-          setTimeout(()=>{ revealText(text, String(m.content)); d.classList.remove('revealing'); }, 40);
+          setTimeout(()=>{ revealText(text, String(m.content)).then(()=>{ d.classList.remove('revealing'); }); }, 40);
           return;
         } else {
           text.textContent = m.content;
