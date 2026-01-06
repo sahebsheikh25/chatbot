@@ -39,26 +39,31 @@ document.addEventListener('DOMContentLoaded', function() {
 const navToggle = document.getElementById('navToggle');
 const navMenu = document.getElementById('navMenu');
 
-if (navToggle) {
+if (navToggle && navMenu) {
     navToggle.addEventListener('click', () => {
         navMenu.classList.toggle('active');
-        
-        // Animate hamburger
+
+        // Animate hamburger (guard spans)
         const spans = navToggle.querySelectorAll('span');
-        spans[0].style.transform = navMenu.classList.contains('active') ? 'rotate(45deg) translate(5px, 5px)' : '';
-        spans[1].style.opacity = navMenu.classList.contains('active') ? '0' : '1';
-        spans[2].style.transform = navMenu.classList.contains('active') ? 'rotate(-45deg) translate(7px, -6px)' : '';
+        const active = navMenu.classList.contains('active');
+        if (spans && spans.length >= 3) {
+            spans[0].style.transform = active ? 'rotate(45deg) translate(5px, 5px)' : '';
+            spans[1].style.opacity = active ? '0' : '1';
+            spans[2].style.transform = active ? 'rotate(-45deg) translate(7px, -6px)' : '';
+        }
     });
 
-    // Close menu when clicking on a link
-    const navLinks = document.querySelectorAll('.nav-link');
+    // Close menu when clicking on a link (use links inside the menu)
+    const navLinks = navMenu.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
         link.addEventListener('click', () => {
             navMenu.classList.remove('active');
             const spans = navToggle.querySelectorAll('span');
-            spans[0].style.transform = '';
-            spans[1].style.opacity = '1';
-            spans[2].style.transform = '';
+            if (spans && spans.length >= 3) {
+                spans[0].style.transform = '';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = '';
+            }
         });
     });
 }
@@ -75,8 +80,11 @@ menuItems.forEach(item => {
 // Smooth Scroll for Anchor Links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (!href || href === '#') return;
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        let target = null;
+        try { target = document.querySelector(href); } catch (err) { target = null; }
         if (target) {
             target.scrollIntoView({
                 behavior: 'smooth',
@@ -129,14 +137,17 @@ function showSuccessPopup() {
             </div>
             <h3>Message Sent Successfully!</h3>
             <p>Thank you for contacting us. We'll get back to you soon.</p>
-            <button class="btn btn-primary" onclick="this.parentElement.parentElement.remove()">Close</button>
+            <button class="btn btn-primary close-popup">Close</button>
         </div>
     `;
     document.body.appendChild(popup);
-    
-    // Auto remove after 5 seconds
+
+    const closeBtn = popup.querySelector('.close-popup');
+    if (closeBtn) closeBtn.addEventListener('click', () => popup.remove());
+
+    // Auto remove after 5 seconds (only if still attached)
     setTimeout(() => {
-        popup.remove();
+        if (popup.parentElement) popup.remove();
     }, 5000);
 }
 
@@ -176,14 +187,16 @@ function filterTools(category, evt) {
 const searchInput = document.getElementById('toolSearch');
 if (searchInput) {
     searchInput.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
+        const searchTerm = (e.target.value || '').toLowerCase();
         const tools = document.querySelectorAll('.tool-card');
-        
+
         tools.forEach(tool => {
-            const title = tool.querySelector('h3').textContent.toLowerCase();
-            const description = tool.querySelector('p').textContent.toLowerCase();
-            
-            if (title.includes(searchTerm) || description.includes(searchTerm)) {
+            const titleEl = tool.querySelector('h3');
+            const descEl = tool.querySelector('p');
+            const title = titleEl ? titleEl.textContent.toLowerCase() : '';
+            const description = descEl ? descEl.textContent.toLowerCase() : '';
+
+            if (searchTerm === '' || title.includes(searchTerm) || description.includes(searchTerm)) {
                 tool.style.display = 'block';
             } else {
                 tool.style.display = 'none';
@@ -313,16 +326,19 @@ document.addEventListener('DOMContentLoaded', async function(){
         const doc = parser.parseFromString(html, 'text/html');
         const root = doc.getElementById('sn-chat-root');
         if(root){
-            // append CSS
+            // append CSS if missing
             if(!document.querySelector('link[href="/chatbot.css"]')){
                 const l = document.createElement('link'); l.rel='stylesheet'; l.href='/chatbot.css'; document.head.appendChild(l);
             }
+            // remove any <script> elements inside the fetched fragment (they don't auto-execute when inserted)
+            root.querySelectorAll('script').forEach(s=>s.remove());
             // append widget markup
             document.body.appendChild(root);
-            // append script and ensure it runs
-            if(!document.querySelector('script[src="/chatbot.js"]')){
-                const s = document.createElement('script'); s.src='/chatbot.js'; s.defer=true; document.body.appendChild(s);
-            }
+            // always add an executable script tag so the widget JS runs
+            // remove any stale script tag first
+            const existing = document.querySelectorAll('script[data-sn-chat-src]');
+            existing.forEach(s=>s.remove());
+            const s2 = document.createElement('script'); s2.src = '/chatbot.js'; s2.async = false; s2.setAttribute('data-sn-chat-src','1'); document.body.appendChild(s2);
         }
     }catch(e){ /* silent fail - non-critical */ }
 });

@@ -21,6 +21,9 @@ html,body{ background:var(--bg); }
 }
 #sn-chat-button:active{ cursor:grabbing; transform:scale(.99); }
 
+/* allow dragging on touch without the browser treating it as pan/zoom */
+#sn-chat-button{ touch-action: none; -webkit-user-drag: none; }
+
 /* Subtle outer glow */
 #sn-chat-button::after{ content:''; position:fixed; right:18px; bottom:22px; width:44px; height:44px; border-radius:50%; pointer-events:none; background: radial-gradient(circle, rgba(0,255,76,0.06), transparent 45%); }
 
