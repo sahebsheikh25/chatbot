@@ -6,27 +6,15 @@ export default async function handler(req, res) {
     });
   }
 
-  // Parse incoming JSON body in multiple runtime environments
+  /* ---------- Parse body safely (Edge + Node) ---------- */
   let body = {};
   try {
     if (typeof req.json === 'function') {
       body = await req.json();
     } else if (req.body) {
       body = req.body;
-    } else {
-      // Node.js raw stream fallback
-      body = await new Promise((resolve) => {
-        let data = '';
-        req.on && req.on('data', (chunk) => (data += chunk));
-        req.on && req.on('end', () => {
-          try { resolve(JSON.parse(data || '{}')); } catch (e) { resolve({}); }
-        });
-        // timeout fallback
-        setTimeout(() => resolve({}), 50);
-      });
     }
   } catch (e) {
-    console.error('Error parsing request body:', e && e.message ? e.message : e);
     body = {};
   }
 
@@ -36,7 +24,7 @@ export default async function handler(req, res) {
     ? [{ role: 'user', content: String(body.message) }]
     : [];
 
-  const recent = incoming.slice(-10);
+  const recent = incoming.slice(-8); // keep context light
 
   const system = {
     role: 'system',
@@ -47,99 +35,89 @@ export default async function handler(req, res) {
   const messages = [system, ...recent];
 
   const OR_KEY = process.env.OPENROUTER_API_KEY;
-
   if (!OR_KEY) {
     return res.status(200).json({
-      reply:
-        'System: Chat is not configured. Please set OPENROUTER_API_KEY in Vercel.'
+      reply: 'System: OPENROUTER_API_KEY not configured.'
     });
   }
 
-  try {
-    const modelName = (body && body.model) ? String(body.model) : 'mistralai/devstral-2512:free';
-    const payload = {
-      model: modelName,
-      messages,
-      temperature: typeof body.temperature === 'number' ? body.temperature : 0.2,
-      max_tokens: 512
-    };
+  /* ---------- Model fallback list (most stable → least) ---------- */
+  const MODELS = [
+    'xiaomi/mimo-v2-flash:free',
+    'meta-llama/llama-3-8b-instruct:free',
+    'mistralai/devstral-2512:free'
+  ];
 
-    // headers to send to OpenRouter
-    const baseHeaders = {
-      Authorization: `Bearer ${OR_KEY}`,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'User-Agent': 'snsecurity-chatbot/1.0'
-    };
-    if (process.env.SITE_URL) baseHeaders.Referer = process.env.SITE_URL;
-    if (process.env.SITE_TITLE) baseHeaders['X-Title'] = process.env.SITE_TITLE;
+  const headers = {
+    Authorization: `Bearer ${OR_KEY}`,
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'User-Agent': 'snsecurity-chatbot/1.0'
+  };
 
-    const endpoints = [
-      'https://api.openrouter.ai/v1/chat/completions',
-      'https://openrouter.ai/api/v1/chat/completions'
-    ];
+  if (process.env.SITE_URL) headers.Referer = process.env.SITE_URL;
+  if (process.env.SITE_TITLE) headers['X-Title'] = process.env.SITE_TITLE;
 
-    let lastError = null;
-    let r = null;
-    let text = '';
+  const endpoint = 'https://api.openrouter.ai/v1/chat/completions';
 
-    for (let i = 0; i < endpoints.length; i++) {
-      const url = endpoints[i];
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 15000);
+  let lastError = null;
 
-        r = await fetch(url, {
-          method: 'POST',
-          headers: baseHeaders,
-          body: JSON.stringify(payload),
-          signal: controller.signal
-        });
-
-        clearTimeout(timeout);
-        text = await r.text();
-        // break on any response (we'll handle non-OK below)
-        break;
-      } catch (e) {
-        lastError = e;
-        console.error(`Request to ${url} failed:`, e && e.message ? e.message : e);
-        // small backoff before next attempt
-        await new Promise((res) => setTimeout(res, 200 * (i + 1)));
-      }
-    }
-
-    if (!r) {
-      const msg = lastError && lastError.name === 'AbortError' ? 'Request timed out to AI backend.' : (lastError && lastError.message ? lastError.message : 'fetch failed');
-      console.error('All OpenRouter endpoints failed:', msg);
-      return res.status(502).json({ error: `System: ${msg}` });
-    }
-
-    let json = null;
+  /* ---------- Try models one by one ---------- */
+  for (const model of MODELS) {
     try {
-      json = JSON.parse(text);
-    } catch (e) {
-      console.error('Invalid JSON from OpenRouter:', text);
-      return res.status(502).json({ error: 'System: Invalid response from AI backend.' });
+      const payload = {
+        model,
+        messages,
+        temperature: 0.2,
+        max_tokens: 512
+      };
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+
+      const r = await fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      const text = await r.text();
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        lastError = 'Invalid JSON from provider';
+        continue;
+      }
+
+      if (!r.ok) {
+        lastError =
+          json?.error?.message ||
+          json?.message ||
+          `Provider error (${r.status})`;
+        continue;
+      }
+
+      const reply = json?.choices?.[0]?.message?.content;
+      if (reply) {
+        return res.status(200).json({ reply });
+      }
+
+      lastError = 'Empty response from provider';
+    } catch (err) {
+      lastError =
+        err?.name === 'AbortError'
+          ? 'Timeout contacting AI backend'
+          : err?.message || 'Network error';
     }
-
-    if (!r.ok) {
-      const errMsg = json?.error?.message || json?.message || `AI backend error (${r.status})`;
-      console.error('OpenRouter error:', errMsg);
-      return res.status(r.status).json({ error: `System: ${errMsg}` });
-    }
-
-    const reply = json?.choices?.[0]?.message?.content || json?.reply || 'System: No response from AI.';
-    return res.status(200).json({ reply });
-  } catch (err) {
-    const msg =
-      err?.name === 'AbortError'
-        ? 'Request timed out to AI backend.'
-        : err?.message || 'Network error contacting AI backend.';
-
-    console.error('Chat API error:', msg);
-
-    return res.status(502).json({
-      error: `System: ${msg}`
-    });
   }
+
+  /* ---------- All providers failed ---------- */
+  return res.status(200).json({
+    reply:
+      'System: AI nodes busy or offline. Secure channel retry recommended.'
+  });
 }
