@@ -42,43 +42,45 @@ export default async function handler(req, res) {
       messages,
       temperature: 0.2
     };
+    // Build headers; avoid hardcoding Referer — use env if provided
+    const headers = {
+      Authorization: `Bearer ${OR_KEY}`,
+      'Content-Type': 'application/json'
+    };
+    if (process.env.SITE_URL) headers.Referer = process.env.SITE_URL;
+    if (process.env.SITE_TITLE) headers['X-Title'] = process.env.SITE_TITLE;
 
-    const r = await fetch(
-      'https://api.openrouter.ai/v1/chat/completions',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OR_KEY}`,
-          'Content-Type': 'application/json',
-          // REQUIRED by OpenRouter (very important)
-          'HTTP-Referer': 'https://snsecurity.in', // change to your domain
-          'X-Title': 'SN Security Chatbot'
-        },
-        body: JSON.stringify(payload)
-      }
-    );
+    // Use a timeout to avoid long hangs
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    const r = await fetch('https://api.openrouter.ai/v1/chat/completions', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
 
     const text = await r.text();
     let json;
     try {
       json = JSON.parse(text);
-    } catch (e) {}
-
-    if (!r.ok) {
-      const msg =
-        json?.error?.message ||
-        `System: AI backend error (${r.status})`;
-      return res.status(r.status).json({ error: msg });
+    } catch (e) {
+      // not JSON
     }
 
-    const reply =
-      json?.choices?.[0]?.message?.content ||
-      'System: No response from AI.';
+    if (!r.ok) {
+      const errMsg = json?.error?.message || json?.message || text || `AI backend error (${r.status})`;
+      console.error('OpenRouter error:', r.status, errMsg);
+      return res.status(r.status).json({ error: `System: AI backend error: ${errMsg}` });
+    }
 
+    const reply = json?.choices?.[0]?.message?.content || json?.reply || 'System: No response from AI.';
     return res.status(200).json({ reply });
   } catch (err) {
-    return res.status(502).json({
-      error: 'System: Network error contacting AI backend.'
-    });
+    console.error('Network error contacting AI backend:', err && err.message ? err.message : err);
+    const message = err && err.name === 'AbortError' ? 'Request timed out to AI backend.' : (err && err.message ? err.message : 'Network error contacting AI backend.');
+    return res.status(502).json({ error: `System: ${message}` });
   }
 }
