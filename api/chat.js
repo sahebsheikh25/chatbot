@@ -38,86 +38,70 @@ export default async function handler(req, res) {
 
   try {
     const payload = {
-      model: 'deepseek/deepseek-r1-0528:free',
+      model: 'xiaomi/mimo-v2-flash:free',
       messages,
-      temperature: 0.2
+      temperature: 0.2,
+      max_tokens: 512
     };
-    // Build headers; avoid hardcoding Referer — use env if provided
+
     const headers = {
       Authorization: `Bearer ${OR_KEY}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
     };
+
     if (process.env.SITE_URL) headers.Referer = process.env.SITE_URL;
     if (process.env.SITE_TITLE) headers['X-Title'] = process.env.SITE_TITLE;
 
-    // Try multiple OpenRouter endpoints with a small retry/backoff for robustness
-    const endpoints = [
-      'https://api.openrouter.ai/v1/chat/completions',
-      'https://openrouter.ai/api/v1/chat/completions'
-    ];
-    let lastErr = null;
-    let r = null;
-    let text = '';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
-    for (let i = 0; i < endpoints.length; i++) {
-      const url = endpoints[i];
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 15000);
+    const r = await fetch('https://api.openrouter.ai/v1/chat/completions', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
 
-        // include Accept and a minimal User-Agent for some hosts
-        const reqHeaders = Object.assign({ Accept: 'application/json', 'User-Agent': 'snsecurity-chatbot/1.0' }, headers);
+    clearTimeout(timeout);
 
-        r = await fetch(url, {
-          method: 'POST',
-          headers: reqHeaders,
-          body: JSON.stringify(payload),
-          signal: controller.signal
-        });
-
-        clearTimeout(timeout);
-        text = await r.text();
-        // parse and break if we got a response (even non-OK we'll handle below)
-        break;
-      } catch (e) {
-        lastErr = e;
-        console.error(`OpenRouter request to ${url} failed:`, e && e.message ? e.message : e);
-        // small backoff before next try
-        await new Promise((res) => setTimeout(res, 250 + i * 150));
-      }
-    }
-
-    // If we never got a response object, fail
-    if (!r) {
-      const errMsg = lastErr && lastErr.name === 'AbortError' ? 'Request timed out to AI backend.' : (lastErr && lastErr.message ? lastErr.message : 'fetch failed');
-      console.error('All OpenRouter endpoints failed:', errMsg);
-      return res.status(502).json({ error: `System: ${errMsg}` });
-    }
-
+    const text = await r.text();
     let json;
     try {
       json = JSON.parse(text);
     } catch (e) {
-      // not JSON
-    }
-    let json;
-    try {
-      json = JSON.parse(text);
-    } catch (e) {
-      // not JSON
+      console.error('Invalid JSON from OpenRouter:', text);
+      return res.status(502).json({
+        error: 'System: Invalid response from AI backend.'
+      });
     }
 
     if (!r.ok) {
-      const errMsg = json?.error?.message || json?.message || text || `AI backend error (${r.status})`;
-      console.error('OpenRouter error:', r.status, errMsg);
-      return res.status(r.status).json({ error: `System: AI backend error: ${errMsg}` });
+      const errMsg =
+        json?.error?.message ||
+        json?.message ||
+        `AI backend error (${r.status})`;
+      console.error('OpenRouter error:', errMsg);
+      return res.status(r.status).json({
+        error: `System: ${errMsg}`
+      });
     }
 
-    const reply = json?.choices?.[0]?.message?.content || json?.reply || 'System: No response from AI.';
+    const reply =
+      json?.choices?.[0]?.message?.content ||
+      'System: No response from AI.';
+
     return res.status(200).json({ reply });
   } catch (err) {
-    console.error('Network error contacting AI backend:', err && err.message ? err.message : err);
-    const message = err && err.name === 'AbortError' ? 'Request timed out to AI backend.' : (err && err.message ? err.message : 'Network error contacting AI backend.');
-    return res.status(502).json({ error: `System: ${message}` });
+    const msg =
+      err?.name === 'AbortError'
+        ? 'Request timed out to AI backend.'
+        : err?.message || 'Network error contacting AI backend.';
+
+    console.error('Chat API error:', msg);
+
+    return res.status(502).json({
+      error: `System: ${msg}`
+    });
   }
 }
