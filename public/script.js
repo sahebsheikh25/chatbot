@@ -302,3 +302,28 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Auto-inject chatbot widget on every page (loads chatbot.html, CSS, and JS once)
+document.addEventListener('DOMContentLoaded', async function(){
+    try{
+        if(document.getElementById('sn-chat-root')) return; // already present
+        const resp = await fetch('/chatbot.html', {cache:'no-cache'}).catch(()=>null);
+        if(!resp || !resp.ok) return;
+        const html = await resp.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const root = doc.getElementById('sn-chat-root');
+        if(root){
+            // append CSS
+            if(!document.querySelector('link[href="/chatbot.css"]')){
+                const l = document.createElement('link'); l.rel='stylesheet'; l.href='/chatbot.css'; document.head.appendChild(l);
+            }
+            // append widget markup
+            document.body.appendChild(root);
+            // append script and ensure it runs
+            if(!document.querySelector('script[src="/chatbot.js"]')){
+                const s = document.createElement('script'); s.src='/chatbot.js'; s.defer=true; document.body.appendChild(s);
+            }
+        }
+    }catch(e){ /* silent fail - non-critical */ }
+});
+
