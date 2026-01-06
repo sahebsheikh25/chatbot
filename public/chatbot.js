@@ -79,8 +79,18 @@
         d.textContent = m.content;
       } else { // system
         const label = document.createElement('span'); label.className = 'sys-label'; label.textContent = '[SYSTEM ALERT]';
-        const t = document.createElement('span'); t.textContent = ' ' + m.content;
-        d.appendChild(label); d.appendChild(t);
+        const text = document.createElement('span'); text.className = 'terminal-text';
+        // reveal only for the newest/system message, older history shows instantly
+        if(idx === messages.length - 1){
+          d.classList.add('revealing');
+          d.appendChild(label); d.appendChild(text);
+          messagesEl.appendChild(d);
+          setTimeout(()=>{ revealText(text, String(m.content), 20).then(()=>{ d.classList.remove('revealing'); }); }, 30);
+          return;
+        } else {
+          text.textContent = ' ' + m.content;
+          d.appendChild(label); d.appendChild(text);
+        }
       }
 
       messagesEl.appendChild(d);
