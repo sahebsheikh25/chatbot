@@ -37,10 +37,11 @@ export default async function handler(req, res) {
   }
 
   try {
+    const modelName = (body && body.model) ? String(body.model) : 'mistralai/devstral-2512:free';
     const payload = {
-      model: 'xiaomi/mimo-v2-flash:free',
+      model: modelName,
       messages,
-      temperature: 0.2,
+      temperature: typeof body.temperature === 'number' ? body.temperature : 0.2,
       max_tokens: 512
     };
 
