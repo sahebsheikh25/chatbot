@@ -15,12 +15,58 @@
   let messages = JSON.parse(sessionStorage.getItem('sn_chat_messages')||'[]');
   const MAX_HISTORY = 12;
 
+  function setStatus(text, cls){
+    const el = document.getElementById('sn-chat-status');
+    if(!el) return;
+    el.textContent = text;
+    el.className = 'sn-chat-status ' + (cls || '');
+  }
+
+  function revealText(el, text){
+    // simple typewriter reveal
+    el.textContent = '';
+    let i = 0;
+    function step(){
+      i += 1;
+      el.textContent = text.slice(0, i);
+      if(i < text.length) requestAnimationFrame(step);
+      else el.classList.add('show');
+    }
+    requestAnimationFrame(step);
+  }
+
   function renderMessages(){
     messagesEl.innerHTML = '';
-    messages.forEach(m=>{
+    messages.forEach((m, idx)=>{
       const d = document.createElement('div');
       d.className = 'sn-msg ' + (m.role === 'system' ? 'system' : (m.role === 'user' ? 'user' : 'bot'));
-      d.textContent = m.content;
+
+      if(m.role === 'bot'){
+        const pfx = document.createElement('span'); pfx.className = 'terminal-prefix'; pfx.textContent = '>';
+        const text = document.createElement('span'); text.className = 'terminal-text';
+        // if last message, animate reveal slightly
+        if(idx === messages.length - 1){
+          d.classList.add('revealing');
+          // append prefix and placeholder, then reveal
+          d.appendChild(pfx);
+          d.appendChild(text);
+          messagesEl.appendChild(d);
+          // small delay to allow layout
+          setTimeout(()=>{ revealText(text, String(m.content)); d.classList.remove('revealing'); }, 40);
+          return;
+        } else {
+          text.textContent = m.content;
+          d.appendChild(pfx);
+          d.appendChild(text);
+        }
+      } else if(m.role === 'user'){
+        d.textContent = m.content;
+      } else { // system
+        const label = document.createElement('span'); label.className = 'sys-label'; label.textContent = '[SYSTEM ALERT]';
+        const t = document.createElement('span'); t.textContent = ' ' + m.content;
+        d.appendChild(label); d.appendChild(t);
+      }
+
       messagesEl.appendChild(d);
     });
     scrollToBottom();
@@ -54,19 +100,23 @@
     const text = input.value.trim(); if(!text) return; input.value = '';
     pushMessage('user', text);
     setTyping(true);
+    setStatus('[connecting]', 'connecting');
     try{
       const res = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ messages }) });
       if(!res.ok){
         const j = await res.json().catch(()=>null);
         const friendly = j && j.error ? j.error : 'System: Assistant unavailable. Try again later.';
         pushSystem(friendly);
+        setStatus('[retrying]', 'retrying');
       } else {
         const j = await res.json().catch(()=>null);
         const reply = j && (j.reply || j.output) ? (j.reply || j.output) : 'System: No reply from AI.';
         pushMessage('bot', reply);
+        setStatus('[connected]', 'connected');
       }
     }catch(e){
       pushSystem('Network: could not reach AI backend.');
+      setStatus('[offline]', 'offline');
     }finally{ setTyping(false); }
   });
 
@@ -85,12 +135,36 @@
   function onPointerUp(e){ window.removeEventListener('pointermove', onPointerMove); window.removeEventListener('pointerup', onPointerUp); if(dragging){ const vw=window.innerWidth; const bx = btnEl.getBoundingClientRect().left + btnEl.offsetWidth/2; const snapRight = (bx > vw/2); const margin=12; if(snapRight) btnEl.style.right = margin+'px'; else btnEl.style.right = (vw - btnEl.offsetWidth - margin)+'px'; setTimeout(()=>{ wasDragging = false; }, 220); } dragging=false; try{ btnEl.releasePointerCapture && btnEl.releasePointerCapture(e.pointerId); }catch(e){} }
   btnEl.addEventListener('pointerdown', onPointerDown, {passive:true});
 
-  // VisualViewport to avoid jump on mobile keyboard
-  if(window.visualViewport){ window.visualViewport.addEventListener('resize', ()=>{ scrollToBottom(); }); }
+  // VisualViewport to avoid jump on mobile keyboard and maintain --app-height
+  function updateAppHeight(){
+    try{
+      const vv = window.visualViewport;
+      const h = (vv && vv.height) ? vv.height : window.innerHeight;
+      document.documentElement.style.setProperty('--app-height', h + 'px');
+    }catch(e){ /* ignore */ }
+  }
+
+  // keep chat scrolled to bottom when viewport changes
+  function onViewportChange(){ updateAppHeight(); scrollToBottom(); }
+
+  // initialize
+  updateAppHeight();
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', onViewportChange, {passive:true});
+    window.visualViewport.addEventListener('scroll', onViewportChange, {passive:true});
+  }
+  // fallback
+  window.addEventListener('resize', onViewportChange, {passive:true});
+
+  // when input focuses, some browsers change visualViewport after slight delay
+  input && input.addEventListener('focus', ()=>{ setTimeout(onViewportChange, 50); });
+  input && input.addEventListener('blur', ()=>{ setTimeout(onViewportChange, 50); });
 
   // auto-scroll on new messages
   const mo = new MutationObserver(scrollToBottom); mo.observe(messagesEl, { childList:true, subtree:true });
 
   // initial state
   panel.classList.add('closed');
+  setStatus('[connected]', 'connected');
 })();

@@ -5,7 +5,10 @@
 
   <div id="sn-chat-panel" aria-hidden="true">
     <div class="sn-chat-header">
-      <div class="sn-chat-title">SN Security<span class="blink">_</span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="sn-chat-title">SN Security<span class="blink">_</span></div>
+        <div id="sn-chat-status" class="sn-chat-status">[connected]</div>
+      </div>
       <div class="sn-chat-controls">
         <button id="sn-chat-minimize" aria-label="Minimize chat">—</button>
         <button id="sn-chat-close" aria-label="Close chat">✕</button>
@@ -18,8 +21,11 @@
     </div>
 
     <form id="sn-chat-form" autocomplete="off">
-      <textarea id="sn-chat-input" rows="1" placeholder="type a command or question..." aria-label="Message"></textarea>
-      <button id="sn-chat-send" type="submit">→</button>
+      <div class="sn-input-row">
+        <div class="sn-input-prompt">sn@security:~$</div>
+        <textarea id="sn-chat-input" rows="1" placeholder="type a command or question..." aria-label="Message"></textarea>
+        <button id="sn-chat-send" type="submit">→</button>
+      </div>
     </form>
   </div>
 
