@@ -76,12 +76,12 @@ html,body{ background:var(--bg); }
 .sn-msg.system{ border:1px dashed rgba(255,184,107,0.12); padding:8px 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace }
 
 /* Input bar - fixed at bottom of panel */
-#sn-chat-form{ display:flex; gap:8px; padding:10px; border-top:1px solid rgba(255,255,255,0.02); background:transparent; }
-#sn-chat-input{ flex:1; resize:none; padding:10px 12px; border-radius:6px; border:1px solid rgba(255,255,255,0.02); background:#030303; color:var(--neon-red); min-height:46px; max-height:160px; caret-color:var(--neon-green); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace }
-#sn-chat-send{ background:transparent; color:var(--neon-green); border:1px solid rgba(0,255,76,0.08); padding:8px 12px; border-radius:6px; cursor:pointer }
+#sn-chat-form{ display:flex; gap:8px; padding:10px; border-top:1px solid rgba(255,255,255,0.02); background:transparent; align-items:center; }
+#sn-chat-input{ flex:1 1 auto; min-width:0; resize:none; padding:10px 12px; border-radius:6px; border:1px solid rgba(255,255,255,0.02); background:#030303; color:var(--neon-red); min-height:46px; max-height:160px; caret-color:var(--neon-green); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace }
+#sn-chat-send{ background:transparent; color:var(--neon-green); border:1px solid rgba(0,255,76,0.08); padding:8px 12px; border-radius:6px; cursor:pointer; flex:0 0 auto; min-width:48px; height:44px; display:inline-flex; align-items:center; justify-content:center; z-index:30 }
 
 /* input row and prompt */
-.sn-input-row{ display:flex; align-items:flex-end; gap:8px; }
+.sn-input-row{ display:flex; align-items:center; gap:8px; width:100%; }
 .sn-input-prompt{ color:var(--neon-green); opacity:0.95; font-weight:700; padding:8px 10px; background:transparent; border-radius:4px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace }
 .sn-input-prompt::after{ content:''; display:inline-block; width:8px }
 
