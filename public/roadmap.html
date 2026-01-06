@@ -235,6 +235,22 @@
             .roadmap-timeline {
                 left: 12px;
             }
+            /* Further small-screen tweaks */
+            .roadmap-step { padding: 1rem; }
+            .step-icon { width:40px; height:40px }
+            .topic-tag { font-size:0.85rem; padding:0.4rem 0.8rem }
+        }
+
+        @media (max-width:480px){
+            .roadmap-container { padding: 24px 12px; }
+            .roadmap-hero { padding: 64px 12px 28px; min-height:38vh }
+            .roadmap-inner { padding-left: 8px }
+            .roadmap-timeline { left:8px; }
+            .roadmap-step { padding: 0.9rem; border-radius:8px }
+            .step-header { gap: 0.6rem }
+            .step-duration { font-size:0.85rem }
+            .resource-link { width:100%; display:inline-flex }
+        }
         }
     </style>
 </head>
