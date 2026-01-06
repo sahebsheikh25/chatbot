@@ -5,7 +5,7 @@
   --app-height: 100vh; /* updated dynamically on mobile via JS */
   --safe-bottom: env(safe-area-inset-bottom);
   --glass: rgba(255,255,255,0.02);
-  --neon-green: #00ff4c;
+  --neon-green: #00ff66;
   --neon-red: #ff2e2e;
   --muted:#4b4b4b;
 }
@@ -20,17 +20,25 @@ html,body{ background:var(--bg); }
 /* Floating capsule button (draggable) */
 #sn-chat-button{
   position:fixed; right:18px; bottom:22px; z-index:99999;
-  background:transparent; color:var(--neon-green); border:1px solid rgba(0,255,76,0.12);
+  background: linear-gradient(180deg, rgba(6,12,6,1), rgba(2,6,2,1));
+  color: var(--neon-green); border:1px solid rgba(0,255,102,0.12);
   padding:10px 14px; border-radius:999px; cursor:grab; font-weight:700;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 12px rgba(0,255,76,0.06);
+  text-shadow: 0 0 6px rgba(0,255,102,0.14);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.6),
+    0 0 10px rgba(0,255,102,0.08),
+    0 0 30px rgba(0,255,102,0.06);
+  transition: transform .18s ease, box-shadow .3s ease;
 }
 #sn-chat-button:active{ cursor:grabbing; transform:scale(.99); }
 
 /* allow dragging on touch without the browser treating it as pan/zoom */
 #sn-chat-button{ touch-action: none; -webkit-user-drag: none; }
 
-/* Subtle outer glow */
-#sn-chat-button::after{ content:''; position:fixed; right:18px; bottom:22px; width:44px; height:44px; border-radius:50%; pointer-events:none; background: radial-gradient(circle, rgba(0,255,76,0.06), transparent 45%); }
+/* Neon outer glow + gentle pulse (keeps glow outside button and lightweight) */
+#sn-chat-button::after{ content:''; position:fixed; right:18px; bottom:22px; width:56px; height:56px; border-radius:50%; pointer-events:none; background: radial-gradient(circle, rgba(0,255,102,0.16), rgba(0,255,102,0.06) 40%, transparent 60%); z-index:99998; filter:blur(6px); animation:sn-pulse 3.6s ease-in-out infinite; }
+
+@keyframes sn-pulse{ 0%{ transform:scale(1); opacity:0.85 } 50%{ transform:scale(1.16); opacity:0.45 } 100%{ transform:scale(1); opacity:0.85 } }
 
 /* Chat panel */
 #sn-chat-panel{
@@ -77,8 +85,10 @@ html,body{ background:var(--bg); }
 
 /* Input bar - fixed at bottom of panel */
 #sn-chat-form{ display:flex; gap:8px; padding:10px; border-top:1px solid rgba(255,255,255,0.02); background:transparent; align-items:center; }
-#sn-chat-input{ flex:1 1 auto; min-width:0; resize:none; padding:10px 12px; border-radius:6px; border:1px solid rgba(255,255,255,0.02); background:#030303; color:var(--neon-red); min-height:46px; max-height:160px; caret-color:var(--neon-green); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace }
-#sn-chat-send{ background:transparent; color:var(--neon-green); border:1px solid rgba(0,255,76,0.08); padding:8px 12px; border-radius:6px; cursor:pointer; flex:0 0 auto; min-width:48px; height:44px; display:inline-flex; align-items:center; justify-content:center; z-index:30 }
+#sn-chat-input{ flex:1 1 auto; min-width:0; resize:none; padding:10px 12px; border-radius:8px; border:1px solid rgba(0,255,102,0.08); background: linear-gradient(180deg, rgba(8,10,8,0.9), rgba(6,8,6,0.85)); color: #eaffef; min-height:48px; max-height:160px; caret-color:var(--neon-green); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.02); }
+#sn-chat-input:focus{ outline:none; border-color: var(--neon-green); box-shadow: 0 0 12px rgba(0,255,102,0.18), 0 0 32px rgba(0,255,102,0.06); }
+#sn-chat-input::placeholder{ color: rgba(230,255,230,0.6); }
+#sn-chat-send{ background:transparent; color:var(--neon-green); border:1px solid rgba(0,255,102,0.08); padding:8px 12px; border-radius:8px; cursor:pointer; flex:0 0 auto; min-width:48px; height:44px; display:inline-flex; align-items:center; justify-content:center; z-index:30 }
 
 /* input row and prompt */
 .sn-input-row{ display:flex; align-items:center; gap:8px; width:100%; }
@@ -87,7 +97,6 @@ html,body{ background:var(--bg); }
 
 /* caret styling */
 #sn-chat-input{ caret-color:var(--neon-green); }
-#sn-chat-input::placeholder{ color: rgba(255,255,255,0.12); }
 
 /* typewriter reveal for bot messages (JS toggles .reveal) */
 .sn-msg .terminal-text{ opacity:1; }
@@ -102,7 +111,7 @@ html,body{ background:var(--bg); }
   /* Chat body should resize and the messages area must scroll independently */
   #sn-chat-body{ padding:12px 12px 12px; display:flex; flex-direction:column; }
   /* Make form sticky within the panel so it stays above keyboard without jumping */
-  #sn-chat-form{ position:sticky; bottom:var(--safe-bottom, 0); padding:12px; background:linear-gradient(180deg, rgba(0,0,0,0.96), rgba(0,0,0,0.98)); z-index:20; display:block; }
+  #sn-chat-form{ position:sticky; bottom:var(--safe-bottom, 0); padding:12px; background:linear-gradient(180deg, rgba(6,8,6,0.98), rgba(3,4,3,0.99)); z-index:120; display:block; border-top:1px solid rgba(0,255,102,0.04); }
   .sn-input-row{ align-items:flex-end; }
   /* ensure send button is always visible and doesn't shrink */
   .sn-input-row button{ flex:0 0 auto; min-width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center; }
@@ -111,4 +120,7 @@ html,body{ background:var(--bg); }
 }
 
 /* Focus and accessibility */
-#sn-chat-button:focus, #sn-chat-send:focus, #sn-chat-close:focus{ outline:2px solid rgba(0,255,76,0.12); outline-offset:2px }
+#sn-chat-button:focus, #sn-chat-send:focus, #sn-chat-close:focus{ outline:2px solid rgba(0,255,102,0.12); outline-offset:2px }
+
+/* Ensure input and send remain visible above keyboard on mobile */
+#sn-chat-form, #sn-chat-input, #sn-chat-send { -webkit-tap-highlight-color: transparent; }
