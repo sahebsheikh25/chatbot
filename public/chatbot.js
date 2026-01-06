@@ -135,6 +135,76 @@
   function onPointerUp(e){ window.removeEventListener('pointermove', onPointerMove); window.removeEventListener('pointerup', onPointerUp); if(dragging){ const vw=window.innerWidth; const bx = btnEl.getBoundingClientRect().left + btnEl.offsetWidth/2; const snapRight = (bx > vw/2); const margin=12; if(snapRight) btnEl.style.right = margin+'px'; else btnEl.style.right = (vw - btnEl.offsetWidth - margin)+'px'; setTimeout(()=>{ wasDragging = false; }, 220); } dragging=false; try{ btnEl.releasePointerCapture && btnEl.releasePointerCapture(e.pointerId); }catch(e){} }
   btnEl.addEventListener('pointerdown', onPointerDown, {passive:true});
 
+  // Desktop-only: make the chat panel draggable by its header
+  (function enableHeaderDrag(){
+    const header = panel.querySelector('.sn-chat-header');
+    if(!header) return;
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+    const isSmallScreen = window.matchMedia('(max-width:700px)').matches;
+    if(isTouch || isSmallScreen) return; // disable on touch/mobile
+
+    let isDraggingHeader = false;
+    let startX = 0, startY = 0;
+    let panelLeft = 0, panelTop = 0;
+    let suppressClick = false;
+
+    function onMouseDown(e){
+      if(e.button !== 0) return; // left button only
+      e.preventDefault();
+      const rect = panel.getBoundingClientRect();
+      // switch to left/top coordinates for dragging
+      panel.style.left = rect.left + 'px';
+      panel.style.top = rect.top + 'px';
+      panel.style.right = 'auto';
+      panel.style.bottom = 'auto';
+      panel.style.transform = 'none';
+      panel.style.transition = 'none';
+
+      startX = e.clientX; startY = e.clientY;
+      panelLeft = rect.left; panelTop = rect.top;
+
+      document.addEventListener('mousemove', onMouseMove, {passive:false});
+      document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function onMouseMove(e){
+      const dx = e.clientX - startX; const dy = e.clientY - startY;
+      if(!isDraggingHeader){
+        if(Math.hypot(dx, dy) < 6) return; // threshold to avoid accidental drags
+        isDraggingHeader = true;
+        document.body.style.userSelect = 'none';
+      }
+      e.preventDefault();
+      const vw = window.innerWidth; const vh = window.innerHeight; const margin = 8;
+      const width = panel.offsetWidth; const height = panel.offsetHeight;
+      let nl = panelLeft + dx; let nt = panelTop + dy;
+      nl = Math.max(margin, Math.min(vw - width - margin, nl));
+      nt = Math.max(margin, Math.min(vh - height - margin, nt));
+      panel.style.left = nl + 'px';
+      panel.style.top = nt + 'px';
+    }
+
+    function onMouseUp(e){
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.userSelect = '';
+      panel.style.transition = '';
+      if(isDraggingHeader){
+        suppressClick = true;
+        setTimeout(()=>{ suppressClick = false; }, 200);
+      }
+      isDraggingHeader = false;
+    }
+
+    // Prevent clicks immediately after a drag
+    header.addEventListener('click', function(ev){ if(suppressClick){ ev.stopImmediatePropagation(); ev.preventDefault(); } }, true);
+    header.addEventListener('mousedown', onMouseDown);
+    // If window resized to small screen while attached, remove drag to be safe
+    window.addEventListener('resize', ()=>{
+      if(window.matchMedia('(max-width:700px)').matches){ header.removeEventListener('mousedown', onMouseDown); }
+    });
+  })();
+
   // VisualViewport to avoid jump on mobile keyboard and maintain --app-height
   function updateAppHeight(){
     try{

@@ -48,6 +48,12 @@ html,body{ background:var(--bg); }
   background:linear-gradient(90deg, rgba(10,10,10,0.9), rgba(6,6,6,0.9));
   border-bottom:1px solid rgba(255,255,255,0.02); color:var(--neon-green);
 }
+
+/* Desktop-only draggable cursor on header */
+@media (min-width:701px) and (pointer:fine) {
+  .sn-chat-header{ cursor:move; -webkit-user-select:none; user-select:none; }
+  .sn-chat-header:active{ cursor:grabbing; }
+}
 .sn-chat-title{ font-size:15px; letter-spacing:1px; }
 .sn-chat-title .blink{ display:inline-block; margin-left:6px; color:var(--neon-green); animation:blink 1s steps(2) infinite; }
 .sn-chat-status{ color:var(--neon-green); font-weight:700; opacity:0.9; font-size:12px; }
