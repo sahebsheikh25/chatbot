@@ -1,4 +1,5 @@
 // /api/chat.js — SN Security (stable + fallback)
+import Groq from "groq-sdk";
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(200).json({ info: 'POST JSON { messages: [...] }' });
@@ -26,6 +27,21 @@ export default async function handler(req, res) {
   };
 
   const messages = [system, ...recent];
+
+  /* ---------- Optional: Try Groq SDK (recommended if GROQ_API_KEY set) ---------- */
+  try {
+    if (process.env.GROQ_API_KEY) {
+      const groq = new Groq();
+      const groqResp = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: messages.map(m => ({ role: m.role, content: m.content })),
+      });
+      const reply = groqResp?.choices?.[0]?.message?.content;
+      if (reply) return res.status(200).json({ reply });
+    }
+  } catch (err) {
+    // Fall through to OpenRouter providers on error
+  }
 
   const OR_KEY = process.env.OPENROUTER_API_KEY;
   if (!OR_KEY) {
