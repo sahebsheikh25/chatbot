@@ -52,83 +52,31 @@ export default async function handler(req, res) {
 
   /* ---------- MODEL PRIORITY (TOP → FALLBACK) ---------- */
   const MODELS = [
-    // ✅ STABLE (PAID – highly recommended)
-    'openai/gpt-4o-mini',
+    import Groq from "groq-sdk";
 
-    // ⚠️ FREE (unstable – backup only)
-    'meta-llama/llama-3-8b-instruct:free',
-    'mistralai/devstral-2512:free'
-  ];
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
 
-  const headers = {
-    Authorization: `Bearer ${OR_KEY}`,
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    'User-Agent': 'snsecurity-chatbot/1.0'
-  };
-
-  if (process.env.SITE_URL) headers.Referer = process.env.SITE_URL;
-  if (process.env.SITE_TITLE) headers['X-Title'] = process.env.SITE_TITLE;
-
-  const endpoint = 'https://api.openrouter.ai/v1/chat/completions';
-  let lastError = null;
-
-  /* ---------- Try models one by one ---------- */
-  for (const model of MODELS) {
-    try {
-      const payload = {
-        model,
-        messages,
-        temperature: 0.2,
-        max_tokens: 512
-      };
-
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
-
-      const r = await fetch(endpoint, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(payload),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeout);
-
-      const text = await r.text();
-      let json;
+    export default async function handler(req, res) {
       try {
-        json = JSON.parse(text);
-      } catch {
-        lastError = 'Invalid JSON from provider';
-        continue;
-      }
+        const { message } = req.body;
 
-      if (!r.ok) {
-        lastError =
-          json?.error?.message ||
-          json?.message ||
-          `Provider error (${r.status})`;
-        continue;
-      }
+        const completion = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: "You are SN Security terminal AI." },
+            { role: "user", content: message }
+          ],
+        });
 
-      const reply = json?.choices?.[0]?.message?.content;
-      if (reply) {
-        return res.status(200).json({ reply });
-      }
+        res.status(200).json({
+          reply: completion.choices[0].message.content,
+        });
 
-      lastError = 'Empty response from provider';
-    } catch (err) {
-      lastError =
-        err?.name === 'AbortError'
-          ? 'Timeout contacting AI backend'
-          : err?.message || 'Network error';
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Assistant unavailable" });
+      }
     }
-  }
-
-  /* ---------- All providers failed ---------- */
-  return res.status(200).json({
-    reply:
-      'System: AI nodes busy or offline. Secure channel retry recommended.'
-  });
-}
+        temperature: 0.2,
