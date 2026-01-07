@@ -13,7 +13,10 @@
 
   // session memory only
   let messages = [];
-  try{ messages = JSON.parse(sessionStorage.getItem('sn_chat_messages')||'[]'); }catch(e){ messages = []; }
+  try{ messages = JSON.parse(sessionStorage.getItem('sn_chat_messages')||'[]');
+    // mark older stored messages as already-typed to avoid retyping history
+    messages = messages.map(m => (typeof m === 'object' ? Object.assign({}, m, { typed: true }) : { role:'system', content:String(m), typed:true }));
+  }catch(e){ messages = []; }
   const MAX_HISTORY = 12;
 
   function setStatus(text, cls){
@@ -27,7 +30,12 @@
     requestAnimationFrame(()=>{ if(messagesEl) messagesEl.scrollTop = messagesEl.scrollHeight; });
   }
 
-  function revealText(el, text, speed=18){
+  // typing speed is configurable via CSS var --sn-typing-speed
+  const _rootStyles = getComputedStyle(document.documentElement);
+  const typingSpeed = parseInt(_rootStyles.getPropertyValue('--sn-typing-speed')) || 18;
+
+  function revealText(el, text, speed){
+    speed = (typeof speed === 'number' && speed > 0) ? speed : typingSpeed;
     return new Promise((resolve)=>{
       if(!el) return resolve();
       el.textContent = '';
@@ -54,54 +62,73 @@
     });
   }
 
-  function renderMessages(){
+  async function renderMessages(){
     if(!messagesEl) return;
     messagesEl.innerHTML = '';
+    // sequential reveal timing
+    const typingSpeedLocal = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sn-typing-speed')) || 18;
+    const interLineDelay = 180; // ms between lines
+    let cumulativeDelay = 0;
+
     messages.forEach((m, idx)=>{
       const d = document.createElement('div');
       d.className = 'sn-msg ' + (m.role === 'system' ? 'system' : (m.role === 'user' ? 'user' : 'bot'));
 
+      if(m.role === 'user'){
+        d.textContent = m.content;
+        messagesEl.appendChild(d);
+        return;
+      }
+
+      // bot or system messages: create prefix/text spans
       if(m.role === 'bot'){
         const pfx = document.createElement('span'); pfx.className = 'terminal-prefix'; pfx.textContent = (m.prefix || '>');
         const text = document.createElement('span'); text.className = 'terminal-text';
-        if(idx === messages.length - 1){
-          d.classList.add('revealing');
-          d.appendChild(pfx); d.appendChild(text);
-          messagesEl.appendChild(d);
-          // reveal asynchronously
-          setTimeout(()=>{ revealText(text, String(m.content), 18).then(()=>{ d.classList.remove('revealing'); }); }, 40);
-          return;
-        } else {
+        d.appendChild(pfx); d.appendChild(text);
+        messagesEl.appendChild(d);
+
+        if(m.typed){
+          // already-typed history: show instantly
           text.textContent = m.content;
-          d.appendChild(pfx); d.appendChild(text);
+        } else {
+          // schedule reveal sequentially
+          const estimated = (String(m.content).length * typingSpeedLocal) + 140;
+          setTimeout(()=>{ d.classList.add('revealing'); revealText(text, String(m.content), undefined).then(()=>{ d.classList.remove('revealing'); m.typed = true; try{ sessionStorage.setItem('sn_chat_messages', JSON.stringify(messages)); }catch(e){} }); }, cumulativeDelay + 40);
+          cumulativeDelay += estimated + interLineDelay;
         }
-      } else if(m.role === 'user'){
-        d.textContent = m.content;
       } else { // system
         const label = document.createElement('span'); label.className = 'sys-label'; label.textContent = '[SYSTEM ALERT]';
         const text = document.createElement('span'); text.className = 'terminal-text';
-        // reveal only for the newest/system message, older history shows instantly
-        if(idx === messages.length - 1){
-          d.classList.add('revealing');
-          d.appendChild(label); d.appendChild(text);
-          messagesEl.appendChild(d);
-          setTimeout(()=>{ revealText(text, String(m.content), 20).then(()=>{ d.classList.remove('revealing'); }); }, 30);
-          return;
-        } else {
+        d.appendChild(label); d.appendChild(text);
+        messagesEl.appendChild(d);
+
+        if(m.typed){
           text.textContent = ' ' + m.content;
-          d.appendChild(label); d.appendChild(text);
+        } else {
+          const estimated = (String(m.content).length * typingSpeedLocal) + 140;
+          setTimeout(()=>{ d.classList.add('revealing'); revealText(text, String(m.content), undefined).then(()=>{ d.classList.remove('revealing'); m.typed = true; try{ sessionStorage.setItem('sn_chat_messages', JSON.stringify(messages)); }catch(e){} }); }, cumulativeDelay + 30);
+          cumulativeDelay += estimated + interLineDelay;
         }
       }
-
-      messagesEl.appendChild(d);
     });
-    scrollToBottom();
+
+    // ensure we scroll as messages reveal (allow initial render to settle)
+    if(cumulativeDelay > 0){
+      scrollToBottom();
+      setTimeout(scrollToBottom, cumulativeDelay + 120);
+    } else {
+      scrollToBottom();
+    }
   }
 
   renderMessages();
 
   function pushMessage(role, text){
-    messages.push({role, content: String(text)});
+    // new messages should be treated as not-yet-typed for bot/system
+    const msg = { role, content: String(text) };
+    if(role === 'bot' || role === 'system') msg.typed = false;
+    else msg.typed = true;
+    messages.push(msg);
     if(messages.length>MAX_HISTORY) messages = messages.slice(-MAX_HISTORY);
     try{ sessionStorage.setItem('sn_chat_messages', JSON.stringify(messages)); }catch(e){}
     renderMessages();
