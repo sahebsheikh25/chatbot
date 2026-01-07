@@ -1,16 +1,21 @@
-// /api/chat.js — SN Security (stable + fallback)
-import Groq from "groq-sdk";
+// /api/chat.js — SN Security (Groq streaming handler)
+import { Groq } from 'groq-sdk';
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(200).json({ info: 'POST JSON { messages: [...] }' });
+    return res.status(200).json({ info: 'POST JSON { message: "...", stream?: true }' });
   }
 
-  /* ---------- Parse body (Edge + Node safe) ---------- */
+  // Parse body (Edge + Node safe)
   let body = {};
   try {
     if (typeof req.json === 'function') body = await req.json();
     else if (req.body) body = req.body;
-  } catch {}
+  } catch (e) {
+    body = {};
+  }
 
   const incoming = Array.isArray(body.messages)
     ? body.messages
@@ -28,55 +33,62 @@ export default async function handler(req, res) {
 
   const messages = [system, ...recent];
 
-  /* ---------- Optional: Try Groq SDK (recommended if GROQ_API_KEY set) ---------- */
+  if (!process.env.GROQ_API_KEY) {
+    return res.status(500).json({ error: 'GROQ_API_KEY not configured' });
+  }
+
+  const model = body.model || 'llama-3.3-70b-versatile';
+
   try {
-    if (process.env.GROQ_API_KEY) {
-      const groq = new Groq();
-      const groqResp = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
+    // Streaming path
+    if (body.stream) {
+      const completion = await groq.chat.completions.create({
+        model,
         messages: messages.map(m => ({ role: m.role, content: m.content })),
+        stream: true,
+        temperature: body.temperature ?? 1,
+        max_completion_tokens: body.max_completion_tokens ?? 1024,
+        top_p: body.top_p ?? 1,
       });
-      const reply = groqResp?.choices?.[0]?.message?.content;
-      if (reply) return res.status(200).json({ reply });
-    }
-  } catch (err) {
-    // Fall through to OpenRouter providers on error
-  }
 
-  const OR_KEY = process.env.OPENROUTER_API_KEY;
-  if (!OR_KEY) {
-    return res.status(200).json({
-      reply: 'System: OPENROUTER_API_KEY not configured.'
-    });
-  }
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+        Connection: 'keep-alive'
+      });
 
-  /* ---------- MODEL PRIORITY (TOP → FALLBACK) ---------- */
-  const MODELS = [
-    import Groq from "groq-sdk";
+      req.on('close', () => {
+        try { res.end(); } catch (e) {}
+      });
 
-    const groq = new Groq({
-      apiKey: process.env.GROQ_API_KEY,
-    });
-
-    export default async function handler(req, res) {
-      try {
-        const { message } = req.body;
-
-        const completion = await groq.chat.completions.create({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            { role: "system", content: "You are SN Security terminal AI." },
-            { role: "user", content: message }
-          ],
-        });
-
-        res.status(200).json({
-          reply: completion.choices[0].message.content,
-        });
-
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Assistant unavailable" });
+      for await (const chunk of completion) {
+        const delta = chunk.choices?.[0]?.delta?.content || '';
+        if (delta) {
+          // SSE data frame
+          res.write(`data: ${delta}\n\n`);
+        }
       }
+
+      // Stream finished
+      res.write('event: done\ndata: [DONE]\n\n');
+      res.end();
+      return;
     }
-        temperature: 0.2,
+
+    // Non-streaming path
+    const completion = await groq.chat.completions.create({
+      model,
+      messages: messages.map(m => ({ role: m.role, content: m.content })),
+      temperature: body.temperature ?? 1,
+      max_completion_tokens: body.max_completion_tokens ?? 1024,
+      top_p: body.top_p ?? 1,
+      stream: false
+    });
+
+    const reply = completion.choices?.[0]?.message?.content || '';
+    return res.status(200).json({ reply });
+  } catch (err) {
+    console.error('Groq handler error:', err?.message || err);
+    return res.status(500).json({ error: 'Assistant unavailable' });
+  }
+}

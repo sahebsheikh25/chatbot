@@ -111,6 +111,41 @@
 
   function setTyping(on){ if(typingEl) typingEl.classList.toggle('hidden', !on); scrollToBottom(); }
 
+  // Streaming helper: POST with stream:true and parse SSE-style `data: ` frames
+  async function sendMessageStream(messagesArray, onDelta) {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: messagesArray, stream: true })
+    });
+    if (!res.ok) throw new Error('stream-failed');
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop();
+      for (const part of parts) {
+        const m = part.trim();
+        if (!m) continue;
+        if (m.startsWith('data: ')) {
+          const data = m.replace(/^data: /, '');
+          if (data === '[DONE]') return;
+          onDelta(data);
+        }
+      }
+    }
+    // flush any remaining buffer
+    if (buffer.trim().startsWith('data: ')) {
+      const data = buffer.trim().replace(/^data: /, '');
+      if (data !== '[DONE]') onDelta(data);
+    }
+  }
+
   // open/close logic with mobile-safe body scroll disabling
   let isOpen = false;
   function openChat(){ panel.classList.add('open'); panel.classList.remove('closed'); panel.setAttribute('aria-hidden','false');
@@ -127,21 +162,50 @@
     setTyping(true);
     setStatus('[connecting]', 'connecting');
     try{
-      const res = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ messages }) });
-      if(!res.ok){
-        const j = await res.json().catch(()=>null);
-        const friendly = j && j.error ? j.error : 'System: Assistant unavailable. Try again later.';
-        pushSystem(friendly);
-        setStatus('[retrying]', 'retrying');
-      } else {
-        const j = await res.json().catch(()=>null);
-        const reply = j && (j.reply || j.output || j.message) ? (j.reply || j.output || j.message) : 'System: No reply from AI.';
-        pushMessage('bot', reply);
+      // Create a streaming placeholder in the DOM
+      const streamEl = document.createElement('div'); streamEl.className = 'sn-msg bot';
+      const pfx = document.createElement('span'); pfx.className = 'terminal-prefix'; pfx.textContent = '>';
+      const text = document.createElement('span'); text.className = 'terminal-text';
+      streamEl.appendChild(pfx); streamEl.appendChild(text);
+      messagesEl.appendChild(streamEl);
+      scrollToBottom();
+
+      // Try streaming first
+      try {
+        await sendMessageStream(messages, (chunk)=>{
+          text.insertAdjacentText('beforeend', chunk);
+          scrollToBottom();
+        });
+
+        // persist final message
+        messages.push({ role: 'bot', content: text.textContent });
+        if(messages.length>MAX_HISTORY) messages = messages.slice(-MAX_HISTORY);
+        try{ sessionStorage.setItem('sn_chat_messages', JSON.stringify(messages)); }catch(e){}
         setStatus('[connected]', 'connected');
+      } catch (streamErr) {
+        // stream failed — remove placeholder and fallback to simple fetch
+        streamEl.remove();
+        try{
+          const res = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ messages }) });
+          if(!res.ok){
+            const j = await res.json().catch(()=>null);
+            const friendly = j && j.error ? j.error : 'System: Assistant unavailable. Try again later.';
+            pushSystem(friendly);
+            setStatus('[retrying]', 'retrying');
+          } else {
+            const j = await res.json().catch(()=>null);
+            const reply = j && (j.reply || j.output || j.message) ? (j.reply || j.output || j.message) : 'System: No reply from AI.';
+            pushMessage('bot', reply);
+            setStatus('[connected]', 'connected');
+          }
+        }catch(e){
+          pushSystem('Network: could not reach AI backend.');
+          setStatus('[offline]', 'offline');
+        }
       }
     }catch(e){
-      pushSystem('Network: could not reach AI backend.');
-      setStatus('[offline]', 'offline');
+      pushSystem('Unexpected: could not send message.');
+      setStatus('[error]', 'error');
     }finally{ setTyping(false); }
   });
 
