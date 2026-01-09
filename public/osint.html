@@ -7,6 +7,8 @@
   <title>OSINT Tools & Resources - SN Security</title>
   <link rel="preload" href="/style.css" as="style" onload="this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="/style.css"></noscript>
+  <link rel="preload" href="/chatbot.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/chatbot.css"></noscript>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"></noscript>
   <style>
@@ -16,6 +18,9 @@
     .hero-title{font-family:var(--font-heading);color:var(--accent-primary);font-size:3rem;letter-spacing:2px;margin:0 0 8px;text-transform:uppercase}
     .neon-glow{text-shadow:0 0 8px var(--glow-color)}
     .hero-tagline{color:var(--text-secondary);margin:0}
+    /* OSINT disclaimer block shown under the page headline */
+    .osint-disclaimer{margin-top:14px;padding:12px 16px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.04));border:1px solid rgba(127,219,255,0.04);color:var(--text-secondary);font-size:0.95rem;line-height:1.4}
+    .osint-disclaimer strong{color:var(--accent-primary)}
     .osint-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:20px}
     .tool-box{display:block;padding:14px;border-radius:10px;background:var(--bg-card);border:1px solid var(--border-color);text-decoration:none;color:var(--text-primary);font-weight:600}
     .tool-box small{display:block;color:var(--text-secondary);font-weight:400;margin-top:6px}
@@ -114,6 +119,12 @@
     <div class="hero-content">
       <h1 class="hero-title neon-glow">OSINT Tools & Resources</h1>
       <p class="hero-tagline">Open Source Intelligence gathering tools and techniques</p>
+      <div class="osint-disclaimer" role="note" aria-live="polite">
+        <strong>🔍 Disclaimer:</strong>
+        <span> This page provides a <strong>🔗 redirect link</strong> to external tools that use publicly available data solely for educational and informational purposes. 📘 We do not collect, store, or process any personal information on our servers. All data checks are handled by the external service 🌐, and we have no control over the results or content they provide.</span>
+        <br>
+        <span>By using these links, you acknowledge that SN Security is not responsible 🚫 for any actions taken based on information obtained through external tools. ⚖️ Use resources lawfully and responsibly. This page is for informational purposes and intends to comply with applicable laws 📜, including the Information Technology Act.</span>
+      </div>
     </div>
   </section>
 
@@ -718,5 +729,6 @@
   </script>
 
   <script src="./script.js" defer></script>
+  <script src="/chatbot.js" defer></script>
 </body>
 </html>
