@@ -1319,3 +1319,20 @@ body.sn-chatbot-active{
     border-radius: 9999px !important; /* egg shape */
   }
 }
+
+/* ✅ Allow drag by left/top (remove bottom/right override) */
+.sn-chatbot-container {
+  left: auto;
+  top: auto;
+  right: auto;
+  bottom: auto;
+}
+
+.sn-chatbot-button {
+  cursor: grab;
+  touch-action: none;
+}
+
+.sn-chatbot-button:active {
+  cursor: grabbing;
+}
