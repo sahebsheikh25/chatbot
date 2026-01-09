@@ -6,6 +6,9 @@ class SNSecurityChatbot {
     this.systemPrompt =
       "You are an AI security assistant for SN Security, a cybersecurity learning platform. You provide expert guidance on cybersecurity, OSINT, ethical hacking, digital safety, and related security topics. Keep responses concise, technical, and helpful. Format code examples with proper markdown.";
     
+    // Mobile detection
+    this.isMobile = this.detectMobile();
+    
     // Drag state for button
     this.buttonDragging = false;
     this.buttonStartX = 0;
@@ -25,6 +28,14 @@ class SNSecurityChatbot {
     this.initialViewportHeight = window.innerHeight;
     
     this.init();
+  }
+
+  detectMobile() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+    const isMobileDevice = mobileRegex.test(userAgent.toLowerCase());
+    const isSmallScreen = window.innerWidth <= 480;
+    return isMobileDevice || isSmallScreen;
   }
 
   init() {
@@ -94,9 +105,22 @@ class SNSecurityChatbot {
     this.isOpen = true;
     const window = document.getElementById("sn-chatbot-window");
     const button = document.getElementById("sn-chatbot-toggle");
+    
+    // Add mobile class on mobile devices
+    if (this.isMobile) {
+      window.classList.add("mobile");
+      document.body.classList.add("sn-chatbot-active");
+      document.body.style.overflow = "hidden";
+    }
+    
     window.classList.add("open");
     button.classList.add("active");
-    document.getElementById("sn-chatbot-input").focus();
+    
+    // Delay focus to allow keyboard animation
+    setTimeout(() => {
+      const input = document.getElementById("sn-chatbot-input");
+      input.focus();
+    }, 100);
 
     // Greet on first open
     if (this.messages.length === 0) {
@@ -104,12 +128,24 @@ class SNSecurityChatbot {
         "🔐 Welcome to SN Security AI Assistant! I can help you with cybersecurity, OSINT techniques, ethical hacking guidance, and digital safety. What's your question?"
       );
     }
+    
+    // Auto-scroll after animations complete
+    setTimeout(() => {
+      this.scrollToBottom();
+    }, 150);
   }
 
   closeChat() {
     this.isOpen = false;
     const window = document.getElementById("sn-chatbot-window");
     const button = document.getElementById("sn-chatbot-toggle");
+    
+    if (this.isMobile) {
+      window.classList.remove("mobile");
+      document.body.classList.remove("sn-chatbot-active");
+      document.body.style.overflow = "";
+    }
+    
     window.classList.remove("open");
     button.classList.remove("active");
   }
@@ -270,6 +306,9 @@ class SNSecurityChatbot {
   }
 
   setupDragListeners() {
+    // Don't setup dragging on mobile (full-screen mode)
+    if (this.isMobile) return;
+
     const button = document.getElementById("sn-chatbot-toggle");
     const header = document.querySelector(".sn-chatbot-header");
 
@@ -407,85 +446,69 @@ class SNSecurityChatbot {
   }
 
   setupMobileKeyboardDetection() {
-    window.addEventListener("resize", () => {
-      const currentHeight = window.innerHeight;
-      const heightDifference = this.initialViewportHeight - currentHeight;
+    if (!this.isMobile) return;
 
-      // If height decreased by more than 100px, keyboard likely opened
-      if (heightDifference > 100) {
-        this.handleKeyboardOpened();
-      } else if (heightDifference <= 100 && this.keyboardVisible) {
-        this.handleKeyboardClosed();
-      }
+    const input = document.getElementById("sn-chatbot-input");
+    const window = document.getElementById("sn-chatbot-window");
+
+    input.addEventListener("focus", () => {
+      // Ensure window stays on screen
+      setTimeout(() => {
+        window.scrollIntoView({ behavior: "smooth", block: "start" });
+        this.scrollToBottom();
+      }, 300);
     });
 
-    // Alternative detection for input focus (more reliable)
-    const input = document.getElementById("sn-chatbot-input");
-    if (input) {
-      input.addEventListener("focus", () => {
-        setTimeout(() => this.handleKeyboardOpened(), 300);
-      });
+    // Viewport resize detection for keyboard
+    let resizeTimeout;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const currentHeight = window.innerHeight;
+        const heightDifference = this.initialViewportHeight - currentHeight;
 
-      input.addEventListener("blur", () => {
-        setTimeout(() => this.handleKeyboardClosed(), 300);
+        if (heightDifference > 100 && !this.keyboardVisible) {
+          this.keyboardVisible = true;
+          this.handleKeyboardOpened();
+        } else if (heightDifference <= 100 && this.keyboardVisible) {
+          this.keyboardVisible = false;
+          this.handleKeyboardClosed();
+        }
+      }, 100);
+    });
+
+    // Use visualViewport for more reliable keyboard detection
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", () => {
+        if (this.isOpen && input === document.activeElement) {
+          this.scrollToBottom();
+        }
       });
     }
   }
 
   handleKeyboardOpened() {
-    this.keyboardVisible = true;
+    if (!this.isMobile) return;
+
     const window = document.getElementById("sn-chatbot-window");
-    const container = document.getElementById("sn-chatbot-container");
+    const input = document.getElementById("sn-chatbot-input");
 
-    // Smooth transition for keyboard
-    window.style.transition = "transform 0.3s ease-out";
-    
-    // Move window up to ensure input is visible
-    const currentTransform = window.style.transform;
-    const match = currentTransform.match(/translate\((.+?)px, (.+?)px\)/);
-    let currentX = 0;
-    let currentY = 0;
-
-    if (match) {
-      currentX = parseFloat(match[1]) || 0;
-      currentY = parseFloat(match[2]) || 0;
-    }
-
-    const keyboardHeight = Math.max(window.innerHeight * 0.3, 250);
-    const moveUpBy = Math.max(keyboardHeight - 100, 0);
-
-    window.style.transform = `translate(${currentX}px, ${currentY - moveUpBy}px)`;
-    
-    // Auto-scroll to bottom to show input
+    // Scroll to input field
     setTimeout(() => {
-      const messagesDiv = document.getElementById("sn-chatbot-messages");
-      if (messagesDiv) {
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
+      input.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      this.scrollToBottom();
     }, 100);
   }
 
   handleKeyboardClosed() {
-    this.keyboardVisible = false;
+    if (!this.isMobile) return;
+
     const window = document.getElementById("sn-chatbot-window");
 
-    // Smooth transition back
-    window.style.transition = "transform 0.3s ease-out";
-    
-    const currentTransform = window.style.transform;
-    const match = currentTransform.match(/translate\((.+?)px, (.+?)px\)/);
-    let currentX = 0;
-
-    if (match) {
-      currentX = parseFloat(match[1]) || 0;
-    }
-
-    // Reset to original position (or closer to top-right)
-    window.style.transform = `translate(${currentX}px, 0px)`;
-    
+    // Ensure messages are visible
     setTimeout(() => {
-      window.style.transition = "";
-    }, 300);
+      this.scrollToBottom();
+    }, 100);
   }
 }
 
