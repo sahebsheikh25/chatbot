@@ -59,19 +59,53 @@
         display:grid;
         grid-template-columns: 1fr 1.25fr;
         align-items:start;
+        gap: 24px;
       }
       .intro-card{ background:var(--bg-card); padding:18px; border-radius:10px; border:1px solid var(--border-color); }
-      .contact-form input, .contact-form textarea{ width:100%; box-sizing:border-box; padding:12px; margin:8px 0 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:rgba(0,0,0,0.4); color:var(--text-primary); }
-      .contact-form .btn-primary{ display:inline-block; padding:12px 18px; border-radius:8px; }
+      .intro-card h3{ color:var(--accent-primary); margin:0 0 12px; font-size:1.2rem; }
+      .intro-card p{ margin:0; line-height:1.5; }
+      .contact-form input, .contact-form textarea{ width:100%; box-sizing:border-box; padding:12px; margin:8px 0 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:rgba(0,0,0,0.4); color:var(--text-primary); font-family:inherit; }
+      .contact-form input:focus, .contact-form textarea:focus{ outline:none; border-color:rgba(0,255,178,0.3); background:rgba(0,0,0,0.6); }
+      .contact-form label{ display:block; margin:16px 0 6px; color:var(--text-primary); font-weight:600; }
+      .contact-form .btn-primary{ display:inline-block; padding:12px 18px; border-radius:8px; width:auto; }
 
       @media (max-width:768px){
-        .tools-hero{ padding:88px 12px 40px; }
-        .hero-title{ font-size:2rem }
+        .tools-hero{ padding:60px 12px 40px; }
+        .hero-title{ font-size:2rem; }
+        .hero-tagline{ font-size:0.95rem; }
         .contact-grid{ grid-template-columns:1fr; gap:18px; }
-        .nav-container{ padding:0 12px }
-        main.container{ padding:24px 12px }
-        .intro-card{ padding:14px }
-        .contact-form .btn-primary{ width:100%; }
+        nav.navbar .nav-container{ padding:0 12px; }
+        main.container{ padding:24px 12px; }
+        .intro-card{ padding:14px; margin-bottom:14px; }
+        .intro-card h3{ font-size:1.1rem; margin-bottom:10px; }
+        .intro-card p{ font-size:0.95rem; }
+        .contact-form label{ font-size:0.95rem; margin:12px 0 5px; }
+        .contact-form input, .contact-form textarea{ padding:10px; font-size:16px; margin:6px 0 10px; }
+        .contact-form .btn-primary{ width:100%; margin-top:8px; }
+        .btn-secondary{ display:inline-block; margin-top:10px; }
+        main.container section h3{ font-size:1.3rem; }
+        main.container section p{ font-size:0.95rem; }
+      }
+
+      @media (max-width:480px){
+        .tools-hero{ padding:48px 12px 28px; min-height:45vh; }
+        .hero-title{ font-size:1.6rem; letter-spacing:1px; }
+        .hero-tagline{ font-size:0.9rem; }
+        .contact-grid{ gap:12px; }
+        main.container{ padding:16px 12px; }
+        .intro-card{ padding:12px; margin-bottom:12px; border-radius:8px; }
+        .intro-card h3{ font-size:1rem; margin-bottom:8px; }
+        .intro-card p{ font-size:0.9rem; }
+        .contact-form{ padding:0; }
+        .contact-form label{ font-size:0.9rem; margin:10px 0 4px; }
+        .contact-form input, .contact-form textarea{ padding:10px; font-size:16px; margin:4px 0 8px; border-radius:6px; }
+        .contact-form textarea{ resize:vertical; max-height:180px; }
+        .contact-form .btn-primary{ width:100%; padding:12px; font-size:1rem; margin-top:6px; border-radius:6px; }
+        .btn-secondary{ width:100%; text-align:center; padding:10px; font-size:0.95rem; margin-top:8px; }
+        main.container section h3{ font-size:1.1rem; margin-top:12px; }
+        main.container section p{ font-size:0.9rem; line-height:1.6; }
+        .social-links{ flex-wrap:wrap; gap:12px !important; }
+        .social-link svg{ width:28px; height:28px; }
       }
     </style>
   </head>
