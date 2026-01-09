@@ -345,7 +345,8 @@
 
 .sn-message.user .sn-message-bubble {
   background: none;
-  color: #00ff00;
+  color: #ff3b3b !important;
+  text-shadow: 0 0 6px rgba(255, 59, 59, 0.55);
   font-weight: normal;
   border: none;
   margin-right: 0;
@@ -353,7 +354,8 @@
 
 .sn-message.bot .sn-message-bubble {
   background: none;
-  color: #00ff00;
+  color: #00ff00 !important;
+  text-shadow: 0 0 6px rgba(0, 255, 0, 0.45);
   border: none;
   margin-left: 0;
 }
@@ -611,3 +613,9 @@ body.sn-dragging {
   overflow: hidden;
   touch-action: none;
 }
+
+/* ✅ User message red, bot message green */
+.sn-message.user .sn-message-timestamp {
+  color: rgba(255, 59, 59, 0.6) !important;
+}
+
