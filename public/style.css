@@ -1252,3 +1252,16 @@ body.sn-chatbot-active{
     margin-bottom: 0 !important;
   }
 }
+
+/* ✅ Chat button egg shape */
+.sn-chatbot-button{
+  border-radius: 9999px !important;
+  padding: 10px 30px !important;
+}
+
+@media (max-width: 480px){
+  .sn-chatbot-button{
+    border-radius: 9999px !important;
+    padding: 14px 34px !important;
+  }
+}
