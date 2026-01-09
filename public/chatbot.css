@@ -19,7 +19,7 @@
   font-weight: 700;
   font-family: 'Rajdhani', 'Share Tech Mono', monospace;
   letter-spacing: 1px;
-  cursor: pointer;
+  cursor: grab;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -28,6 +28,9 @@
   transition: all 0.3s ease;
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.6);
   animation: sn-pulse-glow 2.5s ease-in-out infinite;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
 
 @keyframes sn-pulse-glow {
@@ -60,9 +63,12 @@
 }
 
 .sn-chatbot-window {
-  position: absolute;
-  bottom: 70px;
-  right: 0;
+  position: fixed;
+  bottom: auto;
+  right: auto;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 380px;
   height: 500px;
   background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
@@ -72,6 +78,9 @@
   flex-direction: column;
   box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3), 0 0 60px rgba(0, 212, 255, 0.1);
   backdrop-filter: blur(10px);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
 
 .sn-chatbot-window.open {
@@ -97,6 +106,9 @@
   justify-content: space-between;
   align-items: center;
   background: linear-gradient(90deg, rgba(0, 212, 255, 0.05) 0%, rgba(0, 0, 0, 0.1) 100%);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .sn-chatbot-header h3 {
@@ -309,12 +321,24 @@
 
 /* Mobile responsive */
 @media (max-width: 480px) {
+  .sn-chatbot-button {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+
   .sn-chatbot-window {
     width: calc(100vw - 40px);
     height: 60vh;
-    bottom: 80px;
-    right: 50%;
-    transform: translateX(50%);
+    max-height: 70vh;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+  }
+
+  .sn-chatbot-messages {
+    max-height: calc(60vh - 130px);
   }
 
   .sn-message-bubble {
@@ -324,5 +348,11 @@
 
   .sn-chatbot-input {
     font-size: 12px;
+  }
+
+  /* Prevent scrolling on body when dragging on mobile */
+  body.sn-dragging {
+    overflow: hidden;
+    touch-action: none;
   }
 }

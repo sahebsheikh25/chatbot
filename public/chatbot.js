@@ -1,16 +1,37 @@
-// SN Security AI Chatbot - Floating Widget
+// SN Security AI Chatbot - Floating Widget with Drag Support
 class SNSecurityChatbot {
   constructor() {
     this.isOpen = false;
     this.messages = [];
     this.systemPrompt =
       "You are an AI security assistant for SN Security, a cybersecurity learning platform. You provide expert guidance on cybersecurity, OSINT, ethical hacking, digital safety, and related security topics. Keep responses concise, technical, and helpful. Format code examples with proper markdown.";
+    
+    // Drag state for button
+    this.buttonDragging = false;
+    this.buttonStartX = 0;
+    this.buttonStartY = 0;
+    this.buttonOffsetX = 0;
+    this.buttonOffsetY = 0;
+    
+    // Drag state for window
+    this.windowDragging = false;
+    this.windowStartX = 0;
+    this.windowStartY = 0;
+    this.windowOffsetX = 0;
+    this.windowOffsetY = 0;
+    
+    // Mobile keyboard state
+    this.keyboardVisible = false;
+    this.initialViewportHeight = window.innerHeight;
+    
     this.init();
   }
 
   init() {
     this.createChatbotHTML();
     this.attachEventListeners();
+    this.setupDragListeners();
+    this.setupMobileKeyboardDetection();
   }
 
   createChatbotHTML() {
@@ -246,6 +267,225 @@ class SNSecurityChatbot {
   scrollToBottom() {
     const messagesDiv = document.getElementById("sn-chatbot-messages");
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  setupDragListeners() {
+    const button = document.getElementById("sn-chatbot-toggle");
+    const header = document.querySelector(".sn-chatbot-header");
+
+    // Button drag - Mouse events
+    button.addEventListener("mousedown", (e) => this.startDragButton(e));
+    
+    // Button drag - Touch events
+    button.addEventListener("touchstart", (e) => this.startDragButton(e));
+
+    // Window drag by header - Mouse events
+    header.addEventListener("mousedown", (e) => {
+      if (e.target === button || button.contains(e.target)) return;
+      this.startDragWindow(e);
+    });
+
+    // Window drag by header - Touch events
+    header.addEventListener("touchstart", (e) => {
+      if (e.target === button || button.contains(e.target)) return;
+      this.startDragWindow(e);
+    });
+
+    // Global drag movement
+    document.addEventListener("mousemove", (e) => this.dragMove(e));
+    document.addEventListener("touchmove", (e) => this.dragMove(e), { passive: false });
+
+    // Global drag end
+    document.addEventListener("mouseup", () => this.endDrag());
+    document.addEventListener("touchend", () => this.endDrag());
+  }
+
+  startDragButton(e) {
+    const button = document.getElementById("sn-chatbot-toggle");
+    const rect = button.getBoundingClientRect();
+    
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    this.buttonDragging = true;
+    this.buttonStartX = clientX;
+    this.buttonStartY = clientY;
+    
+    const computedStyle = window.getComputedStyle(button);
+    const transform = computedStyle.transform;
+    if (transform && transform !== "none") {
+      const matrix = transform.match(/^matrix\((.+)\)$/);
+      if (matrix) {
+        const values = matrix[1].split(", ");
+        this.buttonOffsetX = parseFloat(values[4]) || 0;
+        this.buttonOffsetY = parseFloat(values[5]) || 0;
+      }
+    } else {
+      this.buttonOffsetX = 0;
+      this.buttonOffsetY = 0;
+    }
+
+    button.style.cursor = "grabbing";
+    if (e.touches) e.preventDefault();
+  }
+
+  startDragWindow(e) {
+    const window = document.getElementById("sn-chatbot-window");
+    if (!window.classList.contains("open")) return;
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    this.windowDragging = true;
+    this.windowStartX = clientX;
+    this.windowStartY = clientY;
+
+    const computedStyle = window.getComputedStyle(window);
+    const transform = computedStyle.transform;
+    if (transform && transform !== "none") {
+      const matrix = transform.match(/^matrix\((.+)\)$/);
+      if (matrix) {
+        const values = matrix[1].split(", ");
+        this.windowOffsetX = parseFloat(values[4]) || 0;
+        this.windowOffsetY = parseFloat(values[5]) || 0;
+      }
+    } else {
+      this.windowOffsetX = 0;
+      this.windowOffsetY = 0;
+    }
+
+    window.style.cursor = "grabbing";
+    if (e.touches) e.preventDefault();
+  }
+
+  dragMove(e) {
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    // Drag button
+    if (this.buttonDragging) {
+      const button = document.getElementById("sn-chatbot-toggle");
+      const deltaX = clientX - this.buttonStartX;
+      const deltaY = clientY - this.buttonStartY;
+
+      const newX = this.buttonOffsetX + deltaX;
+      const newY = this.buttonOffsetY + deltaY;
+
+      button.style.transform = `translate(${newX}px, ${newY}px)`;
+    }
+
+    // Drag window
+    if (this.windowDragging) {
+      const window = document.getElementById("sn-chatbot-window");
+      const deltaX = clientX - this.windowStartX;
+      const deltaY = clientY - this.windowStartY;
+
+      const newX = this.windowOffsetX + deltaX;
+      const newY = this.windowOffsetY + deltaY;
+
+      window.style.transform = `translate(${newX}px, ${newY}px)`;
+    }
+
+    if (e.touches && (this.buttonDragging || this.windowDragging)) {
+      e.preventDefault();
+    }
+  }
+
+  endDrag() {
+    const button = document.getElementById("sn-chatbot-toggle");
+    const window = document.getElementById("sn-chatbot-window");
+
+    if (this.buttonDragging) {
+      button.style.cursor = "pointer";
+    }
+    if (this.windowDragging) {
+      window.style.cursor = "default";
+    }
+
+    this.buttonDragging = false;
+    this.windowDragging = false;
+  }
+
+  setupMobileKeyboardDetection() {
+    window.addEventListener("resize", () => {
+      const currentHeight = window.innerHeight;
+      const heightDifference = this.initialViewportHeight - currentHeight;
+
+      // If height decreased by more than 100px, keyboard likely opened
+      if (heightDifference > 100) {
+        this.handleKeyboardOpened();
+      } else if (heightDifference <= 100 && this.keyboardVisible) {
+        this.handleKeyboardClosed();
+      }
+    });
+
+    // Alternative detection for input focus (more reliable)
+    const input = document.getElementById("sn-chatbot-input");
+    if (input) {
+      input.addEventListener("focus", () => {
+        setTimeout(() => this.handleKeyboardOpened(), 300);
+      });
+
+      input.addEventListener("blur", () => {
+        setTimeout(() => this.handleKeyboardClosed(), 300);
+      });
+    }
+  }
+
+  handleKeyboardOpened() {
+    this.keyboardVisible = true;
+    const window = document.getElementById("sn-chatbot-window");
+    const container = document.getElementById("sn-chatbot-container");
+
+    // Smooth transition for keyboard
+    window.style.transition = "transform 0.3s ease-out";
+    
+    // Move window up to ensure input is visible
+    const currentTransform = window.style.transform;
+    const match = currentTransform.match(/translate\((.+?)px, (.+?)px\)/);
+    let currentX = 0;
+    let currentY = 0;
+
+    if (match) {
+      currentX = parseFloat(match[1]) || 0;
+      currentY = parseFloat(match[2]) || 0;
+    }
+
+    const keyboardHeight = Math.max(window.innerHeight * 0.3, 250);
+    const moveUpBy = Math.max(keyboardHeight - 100, 0);
+
+    window.style.transform = `translate(${currentX}px, ${currentY - moveUpBy}px)`;
+    
+    // Auto-scroll to bottom to show input
+    setTimeout(() => {
+      const messagesDiv = document.getElementById("sn-chatbot-messages");
+      if (messagesDiv) {
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+    }, 100);
+  }
+
+  handleKeyboardClosed() {
+    this.keyboardVisible = false;
+    const window = document.getElementById("sn-chatbot-window");
+
+    // Smooth transition back
+    window.style.transition = "transform 0.3s ease-out";
+    
+    const currentTransform = window.style.transform;
+    const match = currentTransform.match(/translate\((.+?)px, (.+?)px\)/);
+    let currentX = 0;
+
+    if (match) {
+      currentX = parseFloat(match[1]) || 0;
+    }
+
+    // Reset to original position (or closer to top-right)
+    window.style.transform = `translate(${currentX}px, 0px)`;
+    
+    setTimeout(() => {
+      window.style.transition = "";
+    }, 300);
   }
 }
 
