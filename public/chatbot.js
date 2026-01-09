@@ -819,3 +819,79 @@ if (document.readyState === "loading") {
 
   applyViewportFix();
 })();
+
+/* ✅ DRAG FUNCTIONALITY FOR CHAT BUTTON */
+(function () {
+  const btn = document.querySelector(".sn-chatbot-button");
+  const container = document.querySelector(".sn-chatbot-container");
+
+  if (!btn || !container) return;
+
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let initialLeft = 0, initialTop = 0;
+
+  function ensurePosition() {
+    const rect = container.getBoundingClientRect();
+    container.style.left = rect.left + "px";
+    container.style.top = rect.top + "px";
+    container.style.right = "auto";
+    container.style.bottom = "auto";
+    container.style.position = "fixed";
+  }
+
+  ensurePosition();
+
+  function onStart(clientX, clientY) {
+    isDragging = true;
+    ensurePosition();
+    const rect = container.getBoundingClientRect();
+    startX = clientX;
+    startY = clientY;
+    initialLeft = rect.left;
+    initialTop = rect.top;
+    document.body.classList.add("sn-dragging");
+  }
+
+  function onMove(clientX, clientY) {
+    if (!isDragging) return;
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+    let newLeft = initialLeft + dx;
+    let newTop = initialTop + dy;
+    const maxLeft = window.innerWidth - container.offsetWidth;
+    const maxTop = window.innerHeight - container.offsetHeight;
+    newLeft = Math.max(8, Math.min(maxLeft - 8, newLeft));
+    newTop = Math.max(8, Math.min(maxTop - 8, newTop));
+    container.style.left = newLeft + "px";
+    container.style.top = newTop + "px";
+  }
+
+  function onEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    document.body.classList.remove("sn-dragging");
+  }
+
+  btn.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    onStart(t.clientX, t.clientY);
+  }, { passive: true });
+
+  window.addEventListener("touchmove", (e) => {
+    if (!isDragging) return;
+    const t = e.touches[0];
+    onMove(t.clientX, t.clientY);
+  }, { passive: false });
+
+  window.addEventListener("touchend", onEnd);
+  btn.addEventListener("mousedown", (e) => {
+    onStart(e.clientX, e.clientY);
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    onMove(e.clientX, e.clientY);
+  });
+
+  window.addEventListener("mouseup", onEnd);
+})();

@@ -1302,3 +1302,8 @@ body.sn-chatbot-active{
     letter-spacing: 1px !important;
   }
 }
+
+/* ✅ Drag functionality support */
+.sn-chatbot-container {
+  touch-action: none;
+}
