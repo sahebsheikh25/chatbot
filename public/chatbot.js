@@ -52,7 +52,7 @@ class SNSecurityChatbot {
     container.className = "sn-chatbot-container";
     container.innerHTML = `
       <button class="sn-chatbot-button" id="sn-chatbot-toggle" title="Open SN Security Terminal">
-        > TERMINAL
+        TERMINAL
       </button>
       
       <div class="sn-chatbot-window" id="sn-chatbot-window">
