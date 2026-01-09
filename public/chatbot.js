@@ -194,15 +194,22 @@ class SNSecurityChatbot {
     const messagesDiv = document.getElementById("sn-chatbot-messages");
     const lineDiv = document.createElement("div");
     lineDiv.className = "sn-message bot";
-    lineDiv.style.color = "#00ff00";
-    lineDiv.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+
+    const messageLine = document.createElement("div");
+    messageLine.className = "sn-message-line";
+
+    const prefix = document.createElement("span");
+    prefix.className = "sn-message-prefix";
+    prefix.textContent = "snsecurity@terminal:~$ ";
 
     const bubble = document.createElement("div");
     bubble.className = "sn-message-bubble";
     bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
     bubble.style.padding = "0";
 
-    lineDiv.appendChild(bubble);
+    messageLine.appendChild(prefix);
+    messageLine.appendChild(bubble);
+    lineDiv.appendChild(messageLine);
     messagesDiv.appendChild(lineDiv);
 
     // Type out each character
@@ -217,15 +224,22 @@ class SNSecurityChatbot {
     const messagesDiv = document.getElementById("sn-chatbot-messages");
     const lineDiv = document.createElement("div");
     lineDiv.className = "sn-message bot";
-    lineDiv.style.color = "#00ff00";
-    lineDiv.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+
+    const messageLine = document.createElement("div");
+    messageLine.className = "sn-message-line";
+
+    const prefix = document.createElement("span");
+    prefix.className = "sn-message-prefix";
+    prefix.textContent = "snsecurity@terminal:~$ ";
 
     const bubble = document.createElement("div");
     bubble.className = "sn-message-bubble";
     bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
     bubble.textContent = text;
 
-    lineDiv.appendChild(bubble);
+    messageLine.appendChild(prefix);
+    messageLine.appendChild(bubble);
+    lineDiv.appendChild(messageLine);
     messagesDiv.appendChild(lineDiv);
     this.scrollToBottom();
   }
@@ -295,6 +309,9 @@ class SNSecurityChatbot {
     const decoder = new TextDecoder();
     let botMessage = "";
     let messageElement = null;
+    let messageLine = null;
+    let prefixElement = null;
+    let bubbleElement = null;
 
     try {
       while (true) {
@@ -308,19 +325,26 @@ class SNSecurityChatbot {
         if (!messageElement) {
           messageElement = document.createElement("div");
           messageElement.className = "sn-message bot";
-          messageElement.style.color = "#00ff00";
-          messageElement.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
 
-          const bubble = document.createElement("div");
-          bubble.className = "sn-message-bubble";
-          bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
-          bubble.textContent = botMessage;
+          messageLine = document.createElement("div");
+          messageLine.className = "sn-message-line";
 
-          messageElement.appendChild(bubble);
+          prefixElement = document.createElement("span");
+          prefixElement.className = "sn-message-prefix";
+          prefixElement.textContent = "snsecurity@terminal:~$ ";
+
+          bubbleElement = document.createElement("div");
+          bubbleElement.className = "sn-message-bubble";
+          bubbleElement.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
+          bubbleElement.textContent = botMessage;
+
+          messageLine.appendChild(prefixElement);
+          messageLine.appendChild(bubbleElement);
+          messageElement.appendChild(messageLine);
           const messagesDiv = document.getElementById("sn-chatbot-messages");
           messagesDiv.appendChild(messageElement);
         } else {
-          messageElement.querySelector(".sn-message-bubble").textContent = botMessage;
+          bubbleElement.textContent = botMessage;
         }
 
         // Auto-scroll to bottom
@@ -350,15 +374,22 @@ class SNSecurityChatbot {
     const messagesDiv = document.getElementById("sn-chatbot-messages");
     const lineDiv = document.createElement("div");
     lineDiv.className = "sn-message user";
-    lineDiv.style.color = "#00ff00";
-    lineDiv.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+
+    const messageLine = document.createElement("div");
+    messageLine.className = "sn-message-line";
+
+    const prefix = document.createElement("span");
+    prefix.className = "sn-message-prefix";
+    prefix.textContent = "snsecurity@user:~$ ";
 
     const bubble = document.createElement("div");
     bubble.className = "sn-message-bubble";
     bubble.textContent = text;
     bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
 
-    lineDiv.appendChild(bubble);
+    messageLine.appendChild(prefix);
+    messageLine.appendChild(bubble);
+    lineDiv.appendChild(messageLine);
     messagesDiv.appendChild(lineDiv);
     this.scrollToBottom();
   }
@@ -371,15 +402,22 @@ class SNSecurityChatbot {
     const messagesDiv = document.getElementById("sn-chatbot-messages");
     const lineDiv = document.createElement("div");
     lineDiv.className = "sn-message bot";
-    lineDiv.style.color = "#00ff00";
-    lineDiv.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+
+    const messageLine = document.createElement("div");
+    messageLine.className = "sn-message-line";
+
+    const prefix = document.createElement("span");
+    prefix.className = "sn-message-prefix";
+    prefix.textContent = "snsecurity@terminal:~$ ";
 
     const bubble = document.createElement("div");
     bubble.className = "sn-message-bubble";
     bubble.textContent = text;
     bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
 
-    lineDiv.appendChild(bubble);
+    messageLine.appendChild(prefix);
+    messageLine.appendChild(bubble);
+    lineDiv.appendChild(messageLine);
     messagesDiv.appendChild(lineDiv);
     this.scrollToBottom();
   }
@@ -389,8 +427,13 @@ class SNSecurityChatbot {
     const div = document.createElement("div");
     div.className = "sn-message bot";
     div.id = "sn-typing-indicator";
-    div.style.color = "#00ff00";
-    div.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+    
+    const messageLine = document.createElement("div");
+    messageLine.className = "sn-message-line";
+
+    const prefix = document.createElement("span");
+    prefix.className = "sn-message-prefix";
+    prefix.textContent = "snsecurity@terminal:~$ ";
     
     const bubble = document.createElement("div");
     bubble.className = "sn-message-bubble";
@@ -399,9 +442,12 @@ class SNSecurityChatbot {
         <div class="sn-typing-dot"></div>
         <div class="sn-typing-dot"></div>
         <div class="sn-typing-dot"></div>
-      </div>
+      </div><span class="sn-terminal-cursor"></span>
     `;
-    div.appendChild(bubble);
+    
+    messageLine.appendChild(prefix);
+    messageLine.appendChild(bubble);
+    div.appendChild(messageLine);
     messagesDiv.appendChild(div);
     this.scrollToBottom();
   }
