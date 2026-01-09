@@ -1185,3 +1185,68 @@ main.container { padding: 48px 20px; }
 @media (pointer:coarse), (max-width:520px) {
         .cursor-glow { display: none !important; }
 }
+/* STEP 1: Stop horizontal cut on mobile */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+/* STEP 2: Roadmap hero mobile fix */
+@media (max-width: 768px) {
+  .roadmap-hero {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    padding: 88px 14px 36px !important;
+  }
+
+  .roadmap-hero .hero-content {
+    padding: 0 10px;
+    text-align: center;
+  }
+}
+/* STEP 3: Timeline & left offset remove on mobile */
+@media (max-width: 768px) {
+
+  .roadmap-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 32px 12px !important;
+    overflow: hidden !important;
+  }
+
+  .roadmap-inner {
+    padding-left: 0 !important;
+  }
+
+  .roadmap-timeline {
+    display: none !important;
+  }
+}
+/* STEP 4: Disable translateX hover on mobile */
+@media (max-width: 768px) {
+  .roadmap-step {
+    transform: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .roadmap-step:hover {
+    transform: none !important;
+  }
+}
+
+/* STEP 5: Extra small mobile polish */
+@media (max-width: 480px) {
+  .roadmap-step {
+    padding: 14px !important;
+    border-radius: 10px;
+  }
+
+  .roadmap-step h3 {
+    font-size: 1.2rem !important;
+  }
+
+  .step-description {
+    font-size: 0.95rem;
+  }
+}
