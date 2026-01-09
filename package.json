@@ -1,0 +1,15 @@
+{
+  "name": "sn-security",
+  "version": "1.0.0",
+  "description": "SN Security - Cybersecurity Learning Platform with AI Chatbot",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "groq-sdk": "^0.8.0"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
