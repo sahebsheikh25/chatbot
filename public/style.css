@@ -1348,4 +1348,77 @@ body.sn-chatbot-active{
     border-radius: 9999px !important; /* egg shape */
     border-width: 1px !important;
   }
+
+
+/* ==========================
+     Mobile: CTF / News layout fixes
+     - Stack cards vertically, full-width and touch-friendly
+     - Keep desktop layout unchanged
+     ========================== */
+
+/* STEP 2: Mobile CTF cards layout fix (user-provided) */
+@media (max-width: 768px) {
+    .ctf-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+
+    .ctf-card {
+        width: 100% !important;
+        min-width: unset !important;
+        max-width: 100% !important;
+        padding: 16px !important;
+        border-radius: 14px !important;
+    }
+
+    /* Events grid (site uses .events-grid / .event-card) */
+    .events-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+
+    .event-card {
+        width: 100% !important;
+        min-width: unset !important;
+        max-width: 100% !important;
+        padding: 14px !important;
+        border-radius: 12px !important;
+        aspect-ratio: auto !important;
+        height: auto !important;
+    }
+
+    /* News list cards (stack and full-width) */
+    .news-list { gap: 14px; }
+    .news-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        padding: 14px !important;
+        border-radius: 12px !important;
+    }
+    .news-thumb { flex: 0 0 96px; width: 96px; height: 64px; }
+}
+
+/* STEP 3: Extra small screen polish (≤480px) */
+@media (max-width: 480px) {
+    .ctf-card { padding: 14px !important; }
+    .ctf-card h3 { font-size: 1.1rem !important; }
+    .ctf-card p { font-size: 0.95rem !important; line-height: 1.6; }
+    .ctf-card .cta-btn { width: 100%; text-align: center; }
+
+    .event-card { padding: 12px !important; border-radius: 10px !important; }
+    .event-card .event-meta h4 { font-size: 1.05rem !important; }
+
+    .news-card { padding: 12px !important; }
+    .news-meta h4 { font-size: 1.05rem !important; }
+    .news-meta p { font-size: 0.95rem !important; line-height: 1.6; }
+    .news-card .btn { width: 100%; }
+}
+
+/* STEP 4: Kill horizontal scroll */
+html, body { overflow-x: hidden !important; }
+
 }
