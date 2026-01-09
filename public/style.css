@@ -1196,3 +1196,10 @@ body.sn-chatbot-active{
     bottom: calc(90px + env(safe-area-inset-bottom)) !important;
   }
 }
+
+/* ✅ Mobile: Chat open hone par floating SN Chat button hide */
+@media (max-width: 768px){
+  body.sn-chatbot-active .sn-chatbot-button{
+    display: none !important;
+  }
+}
