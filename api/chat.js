@@ -11,7 +11,17 @@ export default async function handler(req) {
 
   const { message } = await req.json();
 
-  if (!message) {
+  const body = await req.json().catch(() => ({}));
+
+  const incoming = Array.isArray(body.messages)
+    ? body.messages
+    : body.message
+    ? [{ role: 'user', content: String(body.message) }]
+    : message
+    ? [{ role: 'user', content: String(message) }]
+    : [];
+
+  if (incoming.length === 0) {
     return new Response(
       JSON.stringify({ error: "Message is required" }),
       { status: 400 }
@@ -24,9 +34,7 @@ export default async function handler(req) {
 
   const stream = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",
-    messages: [
-      { role: "user", content: message }
-    ],
+    messages: incoming.map(m => ({ role: m.role, content: m.content })),
     temperature: 1,
     max_completion_tokens: 1024,
     stream: true
@@ -36,17 +44,30 @@ export default async function handler(req) {
 
   const readableStream = new ReadableStream({
     async start(controller) {
-      for await (const chunk of stream) {
-        const content = chunk.choices[0]?.delta?.content || "";
-        controller.enqueue(encoder.encode(content));
+      try {
+        for await (const chunk of stream) {
+          const content = chunk.choices?.[0]?.delta?.content || "";
+          if (content) {
+            // Emit SSE-style `data: ` frames so the client parser can split on "\n\n"
+            controller.enqueue(encoder.encode(`data: ${content}\n\n`));
+          }
+        }
+        // signal done
+        controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+      } catch (e) {
+        // emit an error frame (clients will typically ignore unknown frames)
+        try { controller.enqueue(encoder.encode(`data: [ERROR]\n\n`)); } catch(_){}
+      } finally {
+        controller.close();
       }
-      controller.close();
     }
   });
 
   return new Response(readableStream, {
     headers: {
-      "Content-Type": "text/plain; charset=utf-8"
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive"
     }
   });
 }
