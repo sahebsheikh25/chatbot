@@ -1145,11 +1145,16 @@ body.sn-chatbot-active{
     z-index: 9999 !important;
   }
 
-  /* ✅ Only message area scroll */
+  /* ✅ Mobile: no middle gap + proper scroll */
   .sn-chatbot-window.mobile .sn-chatbot-messages{
-    height: calc(var(--vvh, 100dvh) - 140px) !important; /* header+input */
+    position: absolute !important;
+    top: 58px !important;            /* header height */
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 72px !important;         /* input height */
     overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+    padding: 14px 12px !important;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* ✅ Input fixed bottom */
@@ -1159,8 +1164,35 @@ body.sn-chatbot-active{
     right: 0 !important;
     bottom: 0 !important;
     z-index: 10000 !important;
-    padding-bottom: env(safe-area-inset-bottom) !important;
-    transform: translateY(var(--kbd, 0px)) !important; /* ✅ keyboard lift */
-    transition: transform 0.08s linear;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+    background: #000 !important;
+  }
+
+  /* ✅ input full width */
+  .sn-chatbot-window.mobile .sn-chatbot-input{
+    flex: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* ✅ send button always visible */
+  .sn-chatbot-window.mobile .sn-chatbot-send{
+    flex: 0 0 52px !important;
+    width: 52px !important;
+    height: 44px !important;
+    min-width: 52px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* ✅ Floating button no overlap */
+  .sn-chatbot-container{
+    bottom: calc(90px + env(safe-area-inset-bottom)) !important;
   }
 }
