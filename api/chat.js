@@ -19,16 +19,19 @@ export default async function handler(req, res) {
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: message }],
-      temperature: 1,
-      max_completion_tokens: 1024
+      temperature: 0.8,
+      max_completion_tokens: 512
     });
 
-    res.status(200).json({
-      reply: completion.choices[0].message.content
-    });
+    const reply = completion?.choices?.[0]?.message?.content;
+    if (!reply) {
+      return res.status(500).json({ error: "Empty response" });
+    }
+
+    res.status(200).json({ reply });
 
   } catch (err) {
-    console.error(err);
+    console.error("Groq Error:", err);
     res.status(500).json({ error: "Groq API failed" });
   }
 }

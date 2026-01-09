@@ -1,7 +1,14 @@
-<!-- SN Security Chatbot widget - include this snippet near the end of your <body> -->
-<link rel="stylesheet" href="/chatbot.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SN Security Chatbot</title>
+  <link rel="stylesheet" href="/chatbot.css">
+</head>
+<body>
+
 <div id="sn-chat-root">
-  <button id="sn-chat-button" aria-label="Open SN Chat">SN Chat</button>
+  <button id="sn-chat-button">SN Chat</button>
 
   <div id="sn-chat-panel" aria-hidden="true">
     <div class="sn-chat-header">
@@ -10,24 +17,26 @@
         <div id="sn-chat-status" class="sn-chat-status">[connected]</div>
       </div>
       <div class="sn-chat-controls">
-        <button id="sn-chat-minimize" aria-label="Minimize chat">—</button>
-        <button id="sn-chat-close" aria-label="Close chat">✕</button>
+        <button id="sn-chat-minimize">—</button>
+        <button id="sn-chat-close">✕</button>
       </div>
     </div>
 
     <div id="sn-chat-body">
-      <div id="sn-chat-messages" role="log" aria-live="polite"></div>
+      <div id="sn-chat-messages"></div>
       <div id="sn-chat-typing" class="hidden">typing...</div>
     </div>
 
-    <form id="sn-chat-form" autocomplete="off">
+    <form id="sn-chat-form">
       <div class="sn-input-row">
         <div class="sn-input-prompt">sn@security:~$</div>
-        <textarea id="sn-chat-input" rows="1" placeholder="type a command or question..." aria-label="Message"></textarea>
-        <button id="sn-chat-send" type="submit">→</button>
+        <textarea id="sn-chat-input" rows="1" placeholder="type a command..."></textarea>
+        <button type="submit">→</button>
       </div>
     </form>
   </div>
-
-  <script src="/chatbot.js" defer></script>
 </div>
+
+<script src="/chatbot.js" defer></script>
+</body>
+</html>
