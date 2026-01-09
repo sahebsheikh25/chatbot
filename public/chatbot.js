@@ -555,48 +555,84 @@ class SNSecurityChatbot {
     if (!this.isMobile) return;
 
     const input = document.getElementById("sn-chatbot-input");
-    const window = document.getElementById("sn-chatbot-window");
+    const chatWindow = document.getElementById("sn-chatbot-window");
     const messagesDiv = document.getElementById("sn-chatbot-messages");
+    const inputArea = document.querySelector(".sn-chatbot-input-area");
+    const header = document.querySelector(".sn-chatbot-header");
 
-    // Prevent layout shift by locking position during keyboard interaction
-    input.addEventListener("focus", () => {
-      if (window.classList.contains("mobile")) {
-        document.documentElement.classList.add("sn-keyboard-open");
+    const updateMessagesHeight = () => {
+      try {
+        const vv = window.visualViewport;
+        const availH = vv ? vv.height : window.innerHeight;
+        const headerH = header ? header.getBoundingClientRect().height : 0;
+        const inputH = inputArea ? inputArea.getBoundingClientRect().height : 0;
+        const newH = Math.max(0, availH - headerH - inputH);
+        messagesDiv.style.height = `${newH}px`;
+        messagesDiv.style.maxHeight = `${newH}px`;
+      } catch (err) {
+        // fallback
+        messagesDiv.style.height = "calc(100dvh - 120px)";
       }
-      
+    };
+
+    // When input focuses, lock page and size messages area to visual viewport
+    input.addEventListener("focus", () => {
+      if (chatWindow.classList.contains("mobile")) {
+        document.documentElement.classList.add("sn-keyboard-open");
+        document.body.classList.add("sn-keyboard-open");
+      }
+      // slightly delay to allow viewport to resize
       setTimeout(() => {
-        input.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        updateMessagesHeight();
         this.scrollToBottom();
-      }, 300);
+      }, 50);
     });
 
     input.addEventListener("blur", () => {
       document.documentElement.classList.remove("sn-keyboard-open");
+      document.body.classList.remove("sn-keyboard-open");
+      // restore natural sizing
+      messagesDiv.style.height = "";
+      messagesDiv.style.maxHeight = "";
       setTimeout(() => {
         this.scrollToBottom();
       }, 100);
     });
 
-    // Viewport resize detection for keyboard
+    // Window resize (fallback)
     let resizeTimeout;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        if (this.isOpen && input === document.activeElement) {
-          this.scrollToBottom();
+        if (this.isOpen) {
+          updateMessagesHeight();
+          if (input === document.activeElement) this.scrollToBottom();
         }
-      }, 100);
+      }, 80);
     });
 
-    // Use visualViewport for more reliable keyboard detection
+    // Use visualViewport for reliable keyboard detection on mobile
     if (window.visualViewport) {
       window.visualViewport.addEventListener("resize", () => {
-        if (this.isOpen && input === document.activeElement) {
-          // Don't scroll during active typing - let browser handle it
-          this.scrollToBottom();
+        if (this.isOpen) {
+          updateMessagesHeight();
+          if (input === document.activeElement) this.scrollToBottom();
         }
       });
+
+      window.visualViewport.addEventListener("scroll", () => {
+        if (this.isOpen) updateMessagesHeight();
+      });
     }
+
+    // Initial sizing when chat opens
+    const observer = new MutationObserver(() => {
+      if (chatWindow.classList.contains("open") && chatWindow.classList.contains("mobile")) {
+        updateMessagesHeight();
+        observer.disconnect();
+      }
+    });
+    observer.observe(chatWindow, { attributes: true, attributeFilter: ["class"] });
   }
 
   handleKeyboardOpened() {

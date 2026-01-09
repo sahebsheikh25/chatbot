@@ -512,6 +512,17 @@ body.sn-chatbot-active {
   width: 100%;
 }
 
+/* Prevent scrolling while keyboard or chat modal is active */
+html.sn-keyboard-open,
+body.sn-keyboard-open,
+html.sn-chatbot-active,
+body.sn-chatbot-active {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100dvh !important;
+}
+
 /* Prevent scrolling on body when dragging on mobile */
 body.sn-dragging {
   overflow: hidden;
