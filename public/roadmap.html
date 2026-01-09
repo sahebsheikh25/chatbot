@@ -255,6 +255,24 @@
             .step-header { gap: 0.6rem }
             .step-duration { font-size:0.85rem }
             .resource-link { width:100%; display:inline-flex }
+        
+                /* STEP 1: Fix roadmap headline hidden behind navbar */
+                @media (max-width: 768px) {
+                    .roadmap-hero {
+                        padding-top: 110px !important; /* navbar + safe space */
+                    }
+                    .roadmap-hero .hero-title {
+                        position: relative;
+                        z-index: 2;
+                    }
+                }
+
+                /* STEP 2: Extra safety for very small phones */
+                @media (max-width: 480px) {
+                    .roadmap-hero {
+                        padding-top: 120px !important;
+                    }
+                }
         }
         
     </style>
