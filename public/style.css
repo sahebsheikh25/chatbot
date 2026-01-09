@@ -1203,3 +1203,52 @@ body.sn-chatbot-active{
     display: none !important;
   }
 }
+
+/* ✅ FINAL FIX: Remove extra top/bottom gap on mobile */
+@media (max-width: 768px){
+
+  /* Header fixed stays */
+  .sn-chatbot-window.mobile .sn-chatbot-header{
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+  }
+
+  /* ✅ Force messages to fill space perfectly */
+  .sn-chatbot-window.mobile .sn-chatbot-messages{
+    position: absolute !important;
+    top: 56px !important;      /* header height */
+    bottom: 74px !important;   /* input height */
+    left: 0 !important;
+    right: 0 !important;
+
+    /* ✅ kill all gaps */
+    margin: 0 !important;
+    padding: 12px !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* ✅ Input fixed bottom */
+  .sn-chatbot-window.mobile .sn-chatbot-input-area{
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 10000 !important;
+    margin: 0 !important;
+  }
+}
+
+/* ✅ Ensure @media 480px doesn't add extra margin */
+@media (max-width: 480px){
+  .sn-chatbot-messages{
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
