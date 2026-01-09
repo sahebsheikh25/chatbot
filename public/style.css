@@ -1307,3 +1307,15 @@ body.sn-chatbot-active{
 .sn-chatbot-container {
   touch-action: none;
 }
+
+/* ✅ Desktop ko touch nahi karna — only MOBILE size adjust */
+@media (max-width: 768px){
+  .sn-chatbot-container .sn-chatbot-button{
+    padding: 10px 16px !important;  /* thoda chhota */
+    height: 42px !important;
+    min-width: 105px !important;
+    font-size: 12px !important;
+    letter-spacing: 1px !important;
+    border-radius: 9999px !important; /* egg shape */
+  }
+}

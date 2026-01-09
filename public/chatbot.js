@@ -824,74 +824,92 @@ if (document.readyState === "loading") {
 (function () {
   const btn = document.querySelector(".sn-chatbot-button");
   const container = document.querySelector(".sn-chatbot-container");
-
   if (!btn || !container) return;
 
-  let isDragging = false;
+  let dragging = false;
+  let moved = false;
   let startX = 0, startY = 0;
-  let initialLeft = 0, initialTop = 0;
+  let baseLeft = 0, baseTop = 0;
 
-  function ensurePosition() {
+  function initPos() {
     const rect = container.getBoundingClientRect();
+    container.style.position = "fixed";
     container.style.left = rect.left + "px";
     container.style.top = rect.top + "px";
     container.style.right = "auto";
     container.style.bottom = "auto";
-    container.style.position = "fixed";
   }
 
-  ensurePosition();
+  if (!container.dataset.dragInit) {
+    container.dataset.dragInit = "1";
+    initPos();
+  }
 
-  function onStart(clientX, clientY) {
-    isDragging = true;
-    ensurePosition();
+  function start(clientX, clientY) {
+    dragging = true;
+    moved = false;
+    initPos();
+
     const rect = container.getBoundingClientRect();
     startX = clientX;
     startY = clientY;
-    initialLeft = rect.left;
-    initialTop = rect.top;
+    baseLeft = rect.left;
+    baseTop = rect.top;
+
     document.body.classList.add("sn-dragging");
   }
 
-  function onMove(clientX, clientY) {
-    if (!isDragging) return;
+  function move(clientX, clientY) {
+    if (!dragging) return;
+
     const dx = clientX - startX;
     const dy = clientY - startY;
-    let newLeft = initialLeft + dx;
-    let newTop = initialTop + dy;
+
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+
+    let newLeft = baseLeft + dx;
+    let newTop = baseTop + dy;
+
     const maxLeft = window.innerWidth - container.offsetWidth;
     const maxTop = window.innerHeight - container.offsetHeight;
+
     newLeft = Math.max(8, Math.min(maxLeft - 8, newLeft));
     newTop = Math.max(8, Math.min(maxTop - 8, newTop));
+
     container.style.left = newLeft + "px";
     container.style.top = newTop + "px";
   }
 
-  function onEnd() {
-    if (!isDragging) return;
-    isDragging = false;
+  function end() {
+    if (!dragging) return;
+    dragging = false;
     document.body.classList.remove("sn-dragging");
+
+    setTimeout(() => (moved = false), 80);
   }
 
-  btn.addEventListener("touchstart", (e) => {
-    const t = e.touches[0];
-    onStart(t.clientX, t.clientY);
-  }, { passive: true });
+  btn.addEventListener(
+    "touchstart",
+    (e) => {
+      const t = e.touches[0];
+      start(t.clientX, t.clientY);
+    },
+    { passive: true }
+  );
 
-  window.addEventListener("touchmove", (e) => {
-    if (!isDragging) return;
-    const t = e.touches[0];
-    onMove(t.clientX, t.clientY);
-  }, { passive: false });
+  window.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!dragging) return;
+      const t = e.touches[0];
+      move(t.clientX, t.clientY);
+    },
+    { passive: false }
+  );
 
-  window.addEventListener("touchend", onEnd);
-  btn.addEventListener("mousedown", (e) => {
-    onStart(e.clientX, e.clientY);
-  });
+  window.addEventListener("touchend", end);
 
-  window.addEventListener("mousemove", (e) => {
-    onMove(e.clientX, e.clientY);
-  });
-
-  window.addEventListener("mouseup", onEnd);
+  btn.addEventListener("mousedown", (e) => start(e.clientX, e.clientY));
+  window.addEventListener("mousemove", (e) => move(e.clientX, e.clientY));
+  window.addEventListener("mouseup", end);
 })();
