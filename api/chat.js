@@ -1,73 +1,34 @@
 import { Groq } from "groq-sdk";
 
-export const config = {
-  runtime: "edge" // enables fast streaming
-};
-
-export default async function handler(req) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { message } = await req.json();
+  try {
+    const { message } = req.body;
 
-  const body = await req.json().catch(() => ({}));
+    if (!message) {
+      return res.status(400).json({ error: "Message required" });
+    }
 
-  const incoming = Array.isArray(body.messages)
-    ? body.messages
-    : body.message
-    ? [{ role: 'user', content: String(body.message) }]
-    : message
-    ? [{ role: 'user', content: String(message) }]
-    : [];
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY
+    });
 
-  if (incoming.length === 0) {
-    return new Response(
-      JSON.stringify({ error: "Message is required" }),
-      { status: 400 }
-    );
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: message }],
+      temperature: 1,
+      max_completion_tokens: 1024
+    });
+
+    res.status(200).json({
+      reply: completion.choices[0].message.content
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Groq API failed" });
   }
-
-  const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY
-  });
-
-  const stream = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: incoming.map(m => ({ role: m.role, content: m.content })),
-    temperature: 1,
-    max_completion_tokens: 1024,
-    stream: true
-  });
-
-  const encoder = new TextEncoder();
-
-  const readableStream = new ReadableStream({
-    async start(controller) {
-      try {
-        for await (const chunk of stream) {
-          const content = chunk.choices?.[0]?.delta?.content || "";
-          if (content) {
-            // Emit SSE-style `data: ` frames so the client parser can split on "\n\n"
-            controller.enqueue(encoder.encode(`data: ${content}\n\n`));
-          }
-        }
-        // signal done
-        controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
-      } catch (e) {
-        // emit an error frame (clients will typically ignore unknown frames)
-        try { controller.enqueue(encoder.encode(`data: [ERROR]\n\n`)); } catch(_){}
-      } finally {
-        controller.close();
-      }
-    }
-  });
-
-  return new Response(readableStream, {
-    headers: {
-      "Content-Type": "text/event-stream; charset=utf-8",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive"
-    }
-  });
 }
