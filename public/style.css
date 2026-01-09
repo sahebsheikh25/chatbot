@@ -1219,7 +1219,7 @@ body.sn-chatbot-active{
   /* ✅ Force messages to fill space perfectly */
   .sn-chatbot-window.mobile .sn-chatbot-messages{
     position: absolute !important;
-    top: 56px !important;      /* header height */
+    top: 68px !important;      /* header height */
     bottom: 74px !important;   /* input height */
     left: 0 !important;
     right: 0 !important;
