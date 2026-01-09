@@ -1,8 +1,10 @@
-// SN Security AI Chatbot - Floating Widget with Drag Support
+// SN Security AI Terminal - Hacker Interface with Boot Sequence
 class SNSecurityChatbot {
   constructor() {
     this.isOpen = false;
     this.messages = [];
+    this.booted = false;
+    this.isTyping = false;
     this.systemPrompt =
       "You are an AI security assistant for SN Security, a cybersecurity learning platform. You provide expert guidance on cybersecurity, OSINT, ethical hacking, digital safety, and related security topics. Keep responses concise, technical, and helpful. Format code examples with proper markdown.";
     
@@ -49,25 +51,27 @@ class SNSecurityChatbot {
     const container = document.createElement("div");
     container.className = "sn-chatbot-container";
     container.innerHTML = `
-      <button class="sn-chatbot-button" id="sn-chatbot-toggle" title="Open SN Security Chat">
-        SN Chat
+      <button class="sn-chatbot-button" id="sn-chatbot-toggle" title="Open SN Security Terminal">
+        > TERMINAL
       </button>
       
       <div class="sn-chatbot-window" id="sn-chatbot-window">
         <div class="sn-chatbot-header">
-          <h3>🔐 SN Security AI</h3>
-          <button class="sn-chatbot-close" id="sn-chatbot-close" title="Close chat">✕</button>
+          <h3>root@snsecurity:~$</h3>
+          <button class="sn-chatbot-close" id="sn-chatbot-close" title="Close terminal">✕</button>
         </div>
         <div class="sn-chatbot-messages" id="sn-chatbot-messages"></div>
         <div class="sn-chatbot-input-area">
+          <span style="color: #00ff00; margin-right: 4px; white-space: nowrap; text-shadow: 0 0 4px rgba(0, 255, 0, 0.4);">snsecurity@user:~$</span>
           <input
             type="text"
             class="sn-chatbot-input"
             id="sn-chatbot-input"
-            placeholder="Ask about security, OSINT, hacking..."
+            placeholder="type command..."
             autocomplete="off"
+            style="flex: 1; background: #000000; border: 1px solid rgba(0, 255, 0, 0.4);"
           />
-          <button class="sn-chatbot-send" id="sn-chatbot-send">→</button>
+          <button class="sn-chatbot-send" id="sn-chatbot-send">SEND</button>
         </div>
       </div>
     `;
@@ -109,26 +113,28 @@ class SNSecurityChatbot {
     // Add mobile class on mobile devices
     if (this.isMobile) {
       window.classList.add("mobile");
+      document.documentElement.classList.add("sn-chatbot-active");
       document.body.classList.add("sn-chatbot-active");
       document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
     }
     
     window.classList.add("open");
     button.classList.add("active");
     
-    // Delay focus to allow keyboard animation
+    // Run boot sequence only once
+    if (!this.booted) {
+      this.runBootSequence();
+      this.booted = true;
+    }
+    
+    // Delay focus to allow animation
     setTimeout(() => {
       const input = document.getElementById("sn-chatbot-input");
       input.focus();
     }, 100);
 
-    // Greet on first open
-    if (this.messages.length === 0) {
-      this.addBotMessage(
-        "🔐 Welcome to SN Security AI Assistant! I can help you with cybersecurity, OSINT techniques, ethical hacking guidance, and digital safety. What's your question?"
-      );
-    }
-    
     // Auto-scroll after animations complete
     setTimeout(() => {
       this.scrollToBottom();
@@ -142,26 +148,98 @@ class SNSecurityChatbot {
     
     if (this.isMobile) {
       window.classList.remove("mobile");
+      document.documentElement.classList.remove("sn-chatbot-active");
       document.body.classList.remove("sn-chatbot-active");
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.documentElement.classList.remove("sn-keyboard-open");
     }
     
     window.classList.remove("open");
     button.classList.remove("active");
   }
 
+  async runBootSequence() {
+    const bootLines = [
+      "> snsecurity@root:~$ initializing secure channel...",
+      "> loading encryption modules [████████] 100%",
+      "> verifying identity...",
+      "> access granted [OK]",
+      "> secure terminal ready.",
+      "",
+    ];
+
+    for (const line of bootLines) {
+      if (line === "") {
+        // Add empty line
+        this.addSystemMessage("");
+        await this.sleep(200);
+      } else {
+        // Type out the line character by character
+        await this.typeOutLine(line);
+        await this.sleep(400);
+      }
+    }
+  }
+
+  async typeOutLine(text) {
+    const messagesDiv = document.getElementById("sn-chatbot-messages");
+    const lineDiv = document.createElement("div");
+    lineDiv.className = "sn-message bot";
+    lineDiv.style.color = "#00ff00";
+    lineDiv.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+
+    const bubble = document.createElement("div");
+    bubble.className = "sn-message-bubble";
+    bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
+    bubble.style.padding = "0";
+
+    lineDiv.appendChild(bubble);
+    messagesDiv.appendChild(lineDiv);
+
+    // Type out each character
+    for (let i = 0; i < text.length; i++) {
+      bubble.textContent = text.substring(0, i + 1);
+      this.scrollToBottom();
+      await this.sleep(20); // Delay between characters
+    }
+  }
+
+  async addSystemMessage(text) {
+    const messagesDiv = document.getElementById("sn-chatbot-messages");
+    const lineDiv = document.createElement("div");
+    lineDiv.className = "sn-message bot";
+    lineDiv.style.color = "#00ff00";
+    lineDiv.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+
+    const bubble = document.createElement("div");
+    bubble.className = "sn-message-bubble";
+    bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
+    bubble.textContent = text;
+
+    lineDiv.appendChild(bubble);
+    messagesDiv.appendChild(lineDiv);
+    this.scrollToBottom();
+  }
+
+  sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   async sendMessage() {
     const input = document.getElementById("sn-chatbot-input");
     const message = input.value.trim();
 
-    if (!message) return;
+    if (!message || this.isTyping) return;
 
-    // Add user message
-    this.addUserMessage(message);
+    // Add user command to terminal
+    this.addUserCommand(message);
     input.value = "";
     input.focus();
 
-    // Show typing indicator
+    // Show system processing
+    this.isTyping = true;
     this.showTypingIndicator();
 
     try {
@@ -196,10 +274,12 @@ class SNSecurityChatbot {
       await this.streamResponse(response);
     } catch (error) {
       this.removeTypingIndicator();
-      console.error("Chatbot error:", error);
-      this.addBotMessage(
-        "⚠️ Error: Unable to connect to AI service. Please try again."
+      console.error("Terminal error:", error);
+      this.addSystemOutput(
+        "error: unable to connect to AI service. please try again."
       );
+    } finally {
+      this.isTyping = false;
     }
   }
 
@@ -219,16 +299,25 @@ class SNSecurityChatbot {
 
         // Create or update message element
         if (!messageElement) {
-          messageElement = this.createMessageElement(botMessage, "bot");
+          messageElement = document.createElement("div");
+          messageElement.className = "sn-message bot";
+          messageElement.style.color = "#00ff00";
+          messageElement.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+
+          const bubble = document.createElement("div");
+          bubble.className = "sn-message-bubble";
+          bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
+          bubble.textContent = botMessage;
+
+          messageElement.appendChild(bubble);
           const messagesDiv = document.getElementById("sn-chatbot-messages");
           messagesDiv.appendChild(messageElement);
         } else {
-          messageElement.textContent = botMessage;
+          messageElement.querySelector(".sn-message-bubble").textContent = botMessage;
         }
 
         // Auto-scroll to bottom
-        const messagesDiv = document.getElementById("sn-chatbot-messages");
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        this.scrollToBottom();
       }
 
       // Add to message history
@@ -240,56 +329,73 @@ class SNSecurityChatbot {
       }
     } catch (error) {
       console.error("Stream error:", error);
-      this.addBotMessage(
-        "⚠️ Connection lost while receiving response. Please try again."
+      this.addSystemOutput(
+        "error: connection lost while receiving response. please try again."
       );
     }
   }
 
-  addUserMessage(text) {
+  addUserCommand(text) {
     this.messages.push({
       role: "user",
       content: text,
     });
-    const messageElement = this.createMessageElement(text, "user");
-    document.getElementById("sn-chatbot-messages").appendChild(messageElement);
+    const messagesDiv = document.getElementById("sn-chatbot-messages");
+    const lineDiv = document.createElement("div");
+    lineDiv.className = "sn-message user";
+    lineDiv.style.color = "#00ff00";
+    lineDiv.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+
+    const bubble = document.createElement("div");
+    bubble.className = "sn-message-bubble";
+    bubble.textContent = text;
+    bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
+
+    lineDiv.appendChild(bubble);
+    messagesDiv.appendChild(lineDiv);
     this.scrollToBottom();
   }
 
-  addBotMessage(text) {
+  addSystemOutput(text) {
     this.messages.push({
       role: "assistant",
       content: text,
     });
-    const messageElement = this.createMessageElement(text, "bot");
-    document.getElementById("sn-chatbot-messages").appendChild(messageElement);
-    this.scrollToBottom();
-  }
+    const messagesDiv = document.getElementById("sn-chatbot-messages");
+    const lineDiv = document.createElement("div");
+    lineDiv.className = "sn-message bot";
+    lineDiv.style.color = "#00ff00";
+    lineDiv.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
 
-  createMessageElement(text, role) {
-    const div = document.createElement("div");
-    div.className = `sn-message ${role}`;
     const bubble = document.createElement("div");
     bubble.className = "sn-message-bubble";
     bubble.textContent = text;
-    div.appendChild(bubble);
-    return div;
+    bubble.style.fontFamily = "'Courier New', 'Share Tech Mono', monospace";
+
+    lineDiv.appendChild(bubble);
+    messagesDiv.appendChild(lineDiv);
+    this.scrollToBottom();
   }
 
   showTypingIndicator() {
+    const messagesDiv = document.getElementById("sn-chatbot-messages");
     const div = document.createElement("div");
     div.className = "sn-message bot";
     div.id = "sn-typing-indicator";
-    div.innerHTML = `
-      <div class="sn-message-bubble">
-        <div class="sn-typing-indicator">
-          <div class="sn-typing-dot"></div>
-          <div class="sn-typing-dot"></div>
-          <div class="sn-typing-dot"></div>
-        </div>
+    div.style.color = "#00ff00";
+    div.style.textShadow = "0 0 4px rgba(0, 255, 0, 0.4)";
+    
+    const bubble = document.createElement("div");
+    bubble.className = "sn-message-bubble";
+    bubble.innerHTML = `
+      <div class="sn-typing-indicator">
+        <div class="sn-typing-dot"></div>
+        <div class="sn-typing-dot"></div>
+        <div class="sn-typing-dot"></div>
       </div>
     `;
-    document.getElementById("sn-chatbot-messages").appendChild(div);
+    div.appendChild(bubble);
+    messagesDiv.appendChild(div);
     this.scrollToBottom();
   }
 
@@ -450,13 +556,25 @@ class SNSecurityChatbot {
 
     const input = document.getElementById("sn-chatbot-input");
     const window = document.getElementById("sn-chatbot-window");
+    const messagesDiv = document.getElementById("sn-chatbot-messages");
 
+    // Prevent layout shift by locking position during keyboard interaction
     input.addEventListener("focus", () => {
-      // Ensure window stays on screen
+      if (window.classList.contains("mobile")) {
+        document.documentElement.classList.add("sn-keyboard-open");
+      }
+      
       setTimeout(() => {
-        window.scrollIntoView({ behavior: "smooth", block: "start" });
+        input.scrollIntoView({ behavior: "smooth", block: "nearest" });
         this.scrollToBottom();
       }, 300);
+    });
+
+    input.addEventListener("blur", () => {
+      document.documentElement.classList.remove("sn-keyboard-open");
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 100);
     });
 
     // Viewport resize detection for keyboard
@@ -464,15 +582,8 @@ class SNSecurityChatbot {
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        const currentHeight = window.innerHeight;
-        const heightDifference = this.initialViewportHeight - currentHeight;
-
-        if (heightDifference > 100 && !this.keyboardVisible) {
-          this.keyboardVisible = true;
-          this.handleKeyboardOpened();
-        } else if (heightDifference <= 100 && this.keyboardVisible) {
-          this.keyboardVisible = false;
-          this.handleKeyboardClosed();
+        if (this.isOpen && input === document.activeElement) {
+          this.scrollToBottom();
         }
       }, 100);
     });
@@ -481,6 +592,7 @@ class SNSecurityChatbot {
     if (window.visualViewport) {
       window.visualViewport.addEventListener("resize", () => {
         if (this.isOpen && input === document.activeElement) {
+          // Don't scroll during active typing - let browser handle it
           this.scrollToBottom();
         }
       });
@@ -490,10 +602,9 @@ class SNSecurityChatbot {
   handleKeyboardOpened() {
     if (!this.isMobile) return;
 
-    const window = document.getElementById("sn-chatbot-window");
     const input = document.getElementById("sn-chatbot-input");
 
-    // Scroll to input field
+    // Ensure input field is visible and focused
     setTimeout(() => {
       input.scrollIntoView({ behavior: "smooth", block: "nearest" });
       this.scrollToBottom();
@@ -503,9 +614,7 @@ class SNSecurityChatbot {
   handleKeyboardClosed() {
     if (!this.isMobile) return;
 
-    const window = document.getElementById("sn-chatbot-window");
-
-    // Ensure messages are visible
+    // Ensure messages are visible when keyboard closes
     setTimeout(() => {
       this.scrollToBottom();
     }, 100);
