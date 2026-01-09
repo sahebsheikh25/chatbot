@@ -1336,3 +1336,16 @@ body.sn-chatbot-active{
 .sn-chatbot-button:active {
   cursor: grabbing;
 }
+
+/* ✅ EXTRA SMALL button ONLY for mobile */
+@media (max-width: 768px){
+  .sn-chatbot-container .sn-chatbot-button{
+    padding: 6px 10px !important;
+    height: 32px !important;
+    min-width: 78px !important;
+    font-size: 10px !important;
+    letter-spacing: 0.5px !important;
+    border-radius: 9999px !important; /* egg shape */
+    border-width: 1px !important;
+  }
+}
