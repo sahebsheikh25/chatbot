@@ -1265,3 +1265,18 @@ body.sn-chatbot-active{
     padding: 14px 34px !important;
   }
 }
+
+/* ✅ FORCE Egg/Capsule shape on MOBILE + DESKTOP */
+.sn-chatbot-container .sn-chatbot-button{
+  border-radius: 9999px !important;
+}
+
+/* ✅ EXTRA STRONG MOBILE OVERRIDE */
+@media (max-width: 768px){
+  .sn-chatbot-container .sn-chatbot-button{
+    border-radius: 9999px !important;
+    padding: 14px 34px !important;
+    height: 52px !important;
+    min-width: 140px !important;
+  }
+}
