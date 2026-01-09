@@ -258,7 +258,7 @@
   margin-top: 0;
   margin-bottom: 0;
   padding: 16px;
-  padding-top: 70px;
+  padding-top: 52px !important;
   padding-bottom: 100px;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -551,7 +551,7 @@
   }
 
   .sn-chatbot-messages {
-    margin-top: 48px !important;
+    margin-top: 0 !important;
     margin-bottom: 80px !important;
     max-height: none !important;
     padding-left: 12px !important;
