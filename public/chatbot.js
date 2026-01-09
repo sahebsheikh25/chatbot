@@ -770,3 +770,52 @@ if (document.readyState === "loading") {
 } else {
   window.snSecurityChatbot = new SNSecurityChatbot();
 }
+
+// 🔥 VisualViewport fix - Main WhatsApp-style keyboard handling
+(function(){
+  const win = document.querySelector(".sn-chatbot-window");
+  const inputBar = document.querySelector(".sn-chatbot-input-area");
+  const input = document.querySelector(".sn-chatbot-input");
+
+  if(!win || !inputBar) return;
+
+  function applyViewportFix(){
+    if(!window.visualViewport) return;
+
+    const vv = window.visualViewport;
+
+    // ✅ dynamic viewport height set
+    document.documentElement.style.setProperty("--vvh", vv.height + "px");
+
+    // ✅ keyboard height detection
+    const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+
+    // ✅ lift input UP (negative translate)
+    document.documentElement.style.setProperty("--kbd", keyboardHeight ? `-${keyboardHeight}px` : "0px");
+  }
+
+  // ✅ Prevent browser auto scroll jump on focus
+  function preventFocusJump(){
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+      applyViewportFix();
+      // message area ko bottom pe le jao
+      const msg = document.querySelector(".sn-chatbot-messages");
+      if(msg) msg.scrollTop = msg.scrollHeight;
+    }, 50);
+  }
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", applyViewportFix);
+    window.visualViewport.addEventListener("scroll", applyViewportFix);
+  }
+
+  window.addEventListener("orientationchange", () => {
+    setTimeout(applyViewportFix, 200);
+  });
+
+  input?.addEventListener("focus", preventFocusJump);
+  input?.addEventListener("click", preventFocusJump);
+
+  applyViewportFix();
+})();
