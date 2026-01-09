@@ -219,6 +219,7 @@
             .roadmap-container {
                 padding: 40px 12px;
                 max-width: 100%;
+                padding-top: 80px; /* space for fixed navbar */
             }
 
             .roadmap-hero {
@@ -248,6 +249,8 @@
             .roadmap-hero { padding: 48px 12px 28px; min-height:38vh }
             .roadmap-inner { padding-left: 8px }
             .roadmap-timeline { left:8px; }
+            /* hide decorative timeline on very small screens to prevent overlap */
+            .roadmap-timeline { display: none; }
             .roadmap-step { padding: 0.9rem; border-radius:8px }
             .step-header { gap: 0.6rem }
             .step-duration { font-size:0.85rem }
