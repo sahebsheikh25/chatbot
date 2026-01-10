@@ -32,6 +32,16 @@
     .tool-box:focus-within{outline:2px solid rgba(0,255,178,0.06);outline-offset:4px}
     .section-block{padding:40px 0}
     .section-title{font-family:var(--font-heading);color:var(--accent-primary);margin:0 0 8px}
+    /* Gradient-filled headlines for OSINT page */
+    .tools-hero .hero-title,
+    .section-title {
+      background: linear-gradient(90deg, #00FFB2 0%, #00E8FF 50%, #9EF0FF 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      text-shadow: 0 0 12px rgba(0,255,178,0.08);
+    }
     .section-sub{color:var(--text-secondary);margin:0 0 12px}
 
     /* Mobile lookup card */
