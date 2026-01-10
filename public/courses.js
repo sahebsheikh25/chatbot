@@ -339,13 +339,28 @@ function closeModal(){
 }
 
 function buyProduct(id){
-    const p = products.find(x=>x.id===id); if(!p) return;
-    if(p.amazonUrl && p.amazonUrl.trim().length > 0){
-        window.open(p.amazonUrl, '_blank', 'noopener');
-        showToast(`Opening link for ${p.name}`);
-    } else {
-        showToast(`Enrolled in ${p.name} — ${formatPrice(p.price)}`);
+  const p = products.find(x=>x.id===id); if(!p) return;
+  // Onclick ad injection: load 3rd-party ad script only on user interaction.
+  // Vendor snippet (original):
+  // <script>(function(s){s.dataset.zone='10444983',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+  // Implemented idempotently below to avoid multiple inserts.
+  try{
+    if(!window.__sn_ads_loaded){
+      window.__sn_ads_loaded = true;
+      const s = document.createElement('script');
+      s.dataset.zone = '10444983';
+      s.async = true;
+      s.src = 'https://al5sm.com/tag.min.js';
+      (document.body || document.documentElement).appendChild(s);
     }
+  }catch(e){ console.warn('Failed to load onclick ad script', e); }
+
+  if(p.amazonUrl && p.amazonUrl.trim().length > 0){
+    window.open(p.amazonUrl, '_blank', 'noopener');
+    showToast(`Opening link for ${p.name}`);
+  } else {
+    showToast(`Enrolled in ${p.name} — ${formatPrice(p.price)}`);
+  }
 }
 
 function showToast(msg,timeout=2800){
