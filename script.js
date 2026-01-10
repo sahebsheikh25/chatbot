@@ -416,3 +416,41 @@ document.addEventListener('DOMContentLoaded', function () {
         try{ glow.remove(); }catch(e){}
     });
 })();
+
+/* ===============================
+   SN Security - 1 Ad Per Session
+   Trigger: Nav/Menu Page Change Click
+   Injected: attaches to nav links, idempotent
+================================ */
+(function(){
+    if (typeof window === 'undefined') return;
+    if (window.__sn_nav_ad_attached) return; // idempotent guard
+    window.__sn_nav_ad_attached = true;
+
+    const AD_URL = "PASTE_YOUR_ADS_DIRECT_LINK_HERE"; // replace with your ad URL
+    const KEY = 'sn_ad_shown_session';
+
+    function snOpenAdOncePerSession(){
+        try{
+            if (sessionStorage.getItem(KEY) === '1') return false;
+            sessionStorage.setItem(KEY, '1');
+            window.open(AD_URL, '_blank', 'noopener,noreferrer');
+            return true;
+        }catch(e){ return false; }
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+        const navLinks = document.querySelectorAll('a.nav-link, .nav-menu a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e){
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#')) return; // ignore anchors
+
+                // Pause navigation briefly to trigger ad (only once per session)
+                e.preventDefault();
+                snOpenAdOncePerSession();
+                setTimeout(() => { window.location.href = href; }, 150);
+            });
+        });
+    });
+})();
