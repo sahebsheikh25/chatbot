@@ -879,6 +879,7 @@ section {
         transition: 0.3s;
         padding: 2rem 0;
         border-bottom: 1px solid var(--border-color);
+        z-index: 9999; /* ensure mobile menu sits above overlays */
     }
 
     .nav-menu.active {
@@ -888,6 +889,8 @@ section {
     .nav-toggle {
         display: flex;
     }
+
+    .nav-menu a { pointer-events: auto; }
 
     .hero-buttons,
     .cta-buttons {

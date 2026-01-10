@@ -43,6 +43,9 @@ if (navToggle) {
     navToggle.addEventListener('click', () => {
         navMenu.classList.toggle('active');
         
+        // update ARIA state for accessibility
+        const expanded = navMenu.classList.contains('active');
+        try { navToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false'); } catch(e){}
         // Animate hamburger
         const spans = navToggle.querySelectorAll('span');
         spans[0].style.transform = navMenu.classList.contains('active') ? 'rotate(45deg) translate(5px, 5px)' : '';
@@ -53,12 +56,17 @@ if (navToggle) {
     // Close menu when clicking on a link
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-        link.addEventListener('click', () => {
+        link.addEventListener('click', (e) => {
+            // allow default navigation to proceed; still close the mobile menu UI
             navMenu.classList.remove('active');
+            try { navToggle.setAttribute('aria-expanded', 'false'); } catch(err){}
             const spans = navToggle.querySelectorAll('span');
-            spans[0].style.transform = '';
-            spans[1].style.opacity = '1';
-            spans[2].style.transform = '';
+            if (spans && spans.length >= 3) {
+                spans[0].style.transform = '';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = '';
+            }
+            // Do not call e.preventDefault() here so navigation is not blocked.
         });
     });
 }
