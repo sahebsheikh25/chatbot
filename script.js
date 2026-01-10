@@ -51,6 +51,12 @@ if (navToggle) {
         spans[0].style.transform = navMenu.classList.contains('active') ? 'rotate(45deg) translate(5px, 5px)' : '';
         spans[1].style.opacity = navMenu.classList.contains('active') ? '0' : '1';
         spans[2].style.transform = navMenu.classList.contains('active') ? 'rotate(-45deg) translate(7px, -6px)' : '';
+        // lock body scroll when menu open
+        if (navMenu.classList.contains('active')) {
+            document.body.classList.add('nav-open');
+        } else {
+            document.body.classList.remove('nav-open');
+        }
     });
 
     // Close menu when clicking on a link
@@ -67,6 +73,8 @@ if (navToggle) {
                 spans[2].style.transform = '';
             }
             // Do not call e.preventDefault() here so navigation is not blocked.
+            // ensure any body lock is removed and menu UI reset in case navigation is prevented
+            document.body.classList.remove('nav-open');
         });
     });
 }

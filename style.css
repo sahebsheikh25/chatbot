@@ -80,7 +80,7 @@ main, header, footer, .container, .content, .site {
     background: rgba(7, 18, 31, 0.95);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
-    z-index: 1000;
+    z-index: 10001;
     padding: 1rem 0;
 }
 
@@ -872,6 +872,8 @@ section {
         position: fixed;
         left: -100%;
         top: 70px;
+        height: calc(100vh - 70px);
+        overflow-y: auto;
         flex-direction: column;
         background: rgba(7, 18, 31, 0.98);
         width: 100%;
@@ -879,7 +881,7 @@ section {
         transition: 0.3s;
         padding: 2rem 0;
         border-bottom: 1px solid var(--border-color);
-        z-index: 9999; /* ensure mobile menu sits above overlays */
+        z-index: 10000; /* sit below navbar but above page content */
     }
 
     .nav-menu.active {
@@ -891,6 +893,9 @@ section {
     }
 
     .nav-menu a { pointer-events: auto; }
+
+    /* lock body scroll when mobile nav is open */
+    body.nav-open { overflow: hidden; }
 
     .hero-buttons,
     .cta-buttons {
