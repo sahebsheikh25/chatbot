@@ -275,6 +275,10 @@ main, header, footer, .container, .content, .site {
     position: relative;
 }
 
+@media (max-width: 768px){
+    .hero{padding:85px 14px 50px !important}
+}
+
 /* ===== Tools Hero (shared) ===== */
 .tools-hero {
     min-height: 60vh;
