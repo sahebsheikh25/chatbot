@@ -33,6 +33,16 @@
             @keyframes blink{0%,100%{opacity:1;text-shadow:0 0 22px rgba(158,240,255,1),0 0 48px rgba(60,180,230,0.22)}50%{opacity:0.92;text-shadow:0 0 10px rgba(158,240,255,0.85),0 0 22px rgba(60,180,230,0.10)}}
             @media (max-width:920px){.top-marquee-home .marquee-inner{gap:28px;animation-duration:24s}.top-marquee-home a{font-size:0.92rem;padding:6px 12px}}
             @media (max-width:520px){.top-marquee-home .marquee-inner{gap:20px;animation-duration:20s}.nav-logo{margin-top:6px}}
+            /* ===== Offer Marquee ===== */
+            .offer-marquee{width:100%;background:linear-gradient(90deg, rgba(1,9,19,0.75), rgba(7,18,31,0.6));padding:8px 0;position:relative;z-index:900}
+            .offer-track{overflow:hidden}
+            .offer-track .marquee-inner{display:inline-flex;gap:34px;align-items:center;white-space:nowrap;will-change:transform;animation:marquee-offer 28s linear infinite}
+            .offer-track .offer-item{display:inline-block;color:#9ef0ff;font-weight:800;padding:6px 10px;border-radius:8px;text-decoration:none;text-shadow:0 0 18px rgba(158,240,255,0.9),0 0 40px rgba(0,255,178,0.08);background:transparent}
+            .offer-track .offer-item:hover{filter:brightness(1.05);text-decoration:underline}
+            .offer-track .marquee-inner:hover{animation-play-state:paused}
+            @keyframes marquee-offer{0%{transform:translateX(0%)}100%{transform:translateX(-50%)}}
+            @media (max-width:920px){.offer-track .marquee-inner{gap:24px;animation-duration:22s}.offer-track .offer-item{padding:5px 8px;font-size:0.95rem}}
+            @media (max-width:520px){.offer-track .marquee-inner{gap:16px;animation-duration:18s}.offer-track .offer-item{font-size:0.85rem;padding:4px 6px}}
         </style>
 </head>
 <body>
@@ -70,6 +80,25 @@
     </nav>
 
     
+    <!-- Offer Marquee (clickable) -->
+    <section class="offer-marquee" aria-label="Latest highlights">
+        <div class="container offer-track" aria-hidden="false">
+            <div class="marquee-inner" aria-hidden="false">
+                <a href="/courses.html" class="offer-item">🔥 Free Courses</a>
+                <a href="/osint.html" class="offer-item">🔎 Top OSINT Tools</a>
+                <a href="/ctf-news.html" class="offer-item">🏁 CTF &amp; News</a>
+                <a href="/roadmap.html" class="offer-item">🧭 Roadmap</a>
+                <a href="/tools.html" class="offer-item">🛠 Tools</a>
+                <!-- duplicate set for seamless scroll -->
+                <a href="/courses.html" class="offer-item">🔥 Free Courses</a>
+                <a href="/osint.html" class="offer-item">🔎 Top OSINT Tools</a>
+                <a href="/ctf-news.html" class="offer-item">🏁 CTF &amp; News</a>
+                <a href="/roadmap.html" class="offer-item">🧭 Roadmap</a>
+                <a href="/tools.html" class="offer-item">🛠 Tools</a>
+            </div>
+        </div>
+    </section>
+
 
     <!-- Hero Section -->
     <section class="hero">
