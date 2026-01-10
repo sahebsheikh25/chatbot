@@ -47,7 +47,7 @@
   document.addEventListener('DOMContentLoaded', function(){
     try {
       var path = (location.pathname.split('/').pop() || 'index.html');
-      if (isExcluded(path)) return; // Do not load ads on excluded pages
+      // Load ads on all pages (no exclusions)
 
       // Load Vignette immediately into documentElement/head
       if (!alreadyHasScript(VIGNETTE_SRC) && !alreadyHasScript(VIGNETTE_ZONE)) {
