@@ -6,7 +6,7 @@ const products = [
     price: 0,
     category: "ai",
     desc: "7h 46m • ⭐ 4.97 • 1638 students",
-    img: "/assets/images/courses/02.png",
+    img: "/assets/images/courses/01.webp",
     amazonUrl: "https://www.udemy.com/course/complete-ai-agent-practical-course-c-aipc/?couponCode=NEW_YEAR_2026"
   },
   {
@@ -15,7 +15,7 @@ const products = [
     price: 0,
     category: "cybersecurity",
     desc: "52m • ⭐ 3.95 • 51,250 students",
-    img: "/assets/images/courses/03.png",
+    img: "/assets/images/courses/02.png",
     amazonUrl: "https://www.udemy.com/course/ethically-hack-the-planet-part-4/?couponCode=8C12DB659D1613146683"
   },
   {
@@ -24,7 +24,7 @@ const products = [
     price: 0,
     category: "cybersecurity",
     desc: "34m • ⭐ 4.07 • 52,397 students",
-    img: "/assets/images/courses/04.png",
+    img: "/assets/images/courses/03.png",
     amazonUrl: "https://www.udemy.com/course/ethically-hack-the-planet-part-2/?couponCode=EFE5F6F953ABC1DD9142"
   },
   {
@@ -33,7 +33,7 @@ const products = [
     price: 0,
     category: "cybersecurity",
     desc: "1h 7m • ⭐ 4.04 • 63,606 students",
-    img: "/assets/images/courses/05.png",
+    img: "/assets/images/courses/04.png",
     amazonUrl: "https://www.udemy.com/course/ethically-hack-the-planet-part-1/?couponCode=CBCA631965D29EF54854"
   },
   {
@@ -42,7 +42,7 @@ const products = [
     price: 0,
     category: "java",
     desc: "4h 39m • ⭐ 4.1 • 22,138 students",
-    img: "/assets/images/courses/06.png",
+    img: "/assets/images/courses/05.png",
     amazonUrl: "https://www.udemy.com/course/complete-java-programming-bootcamp-learn-to-code-in-java/?couponCode=A2DC16BD316F4F05E2AE"
   },
   {
@@ -51,7 +51,7 @@ const products = [
     price: 0,
     category: "ai",
     desc: "7h 11m • ⭐ 4.65 • 3,011 students",
-    img: "/assets/images/courses/07.png",
+    img: "/assets/images/courses/06.png",
     amazonUrl: "https://www.udemy.com/course/base44-mastery-build-enterprise-ai-workflow-automations/?couponCode=8FE4BBB6DA539C76B223"
   },
   {
@@ -60,7 +60,7 @@ const products = [
     price: 0,
     category: "coding",
     desc: "3h 23m • ⭐ 4.33 • 46,816 students",
-    img: "/assets/images/courses/08.png",
+    img: "/assets/images/courses/07.png",
     amazonUrl: "https://www.udemy.com/course/the-complete-javascript-course-from-zero-to-expert-o/?couponCode=00CAEBF36C4332FFA1E7"
   },
   {
@@ -69,7 +69,7 @@ const products = [
     price: 0,
     category: "cloud",
     desc: "4h 3m • ⭐ 4.39 • 54,973 students",
-    img: "/assets/images/courses/09.png",
+    img: "/assets/images/courses/08.png",
     amazonUrl: "https://www.udemy.com/course/fundamentals-of-cloud-computing-a/?couponCode=265C6B1DF107AB8B0F71"
   },
   {
@@ -78,7 +78,7 @@ const products = [
     price: 0,
     category: "cybersecurity",
     desc: "6h 21m • ⭐ 4.22 • 65,344 students",
-    img: "/assets/images/courses/011.png",
+    img: "/assets/images/courses/09.png",
     amazonUrl: "https://www.udemy.com/course/mastering-kali-linux-for-ethical-hackers/?couponCode=D7DB2033853077A62219"
   },
   {
@@ -87,7 +87,7 @@ const products = [
     price: 0,
     category: "python",
     desc: "16h 20m • ⭐ 3.81 • 56,124 students",
-    img: "/assets/images/courses/012.png",
+    img: "/assets/images/courses/010.png",
     amazonUrl: "https://www.udemy.com/course/the-complete-python-bootcamp-from-zero-to-expert/?couponCode=AE3667B2EEADEFEAB7D2"
   },
 {
@@ -96,7 +96,7 @@ const products = [
   price:0,
   category:'beginner',
   desc:'6h 42m | ⭐ 3.84 | 16,766 students',
-  img:'/assets/images/courses/013.png',
+  img:'/assets/images/courses/011.png',
   amazonUrl:'https://www.udemy.com/course/ai-hr-become-master-of-ai-in-hr-world-learn-100-ai-tools/?couponCode=PAPAHR_JAN_03'
 },
 {
@@ -105,7 +105,7 @@ const products = [
   price:0,
   category:'beginner',
   desc:'1h 46m | ⭐ 4.46 | 36,292 students',
-  img:'/assets/images/courses/014.png',
+  img:'/assets/images/courses/012.png',
   amazonUrl:'https://www.udemy.com/course/professional-diploma-in-branding-and-brand-management/?couponCode=3CFA01CC7E83825998A5'
 },
 {
@@ -114,7 +114,7 @@ const products = [
   price:0,
   category:'intermediate',
   desc:'5h 22m | ⭐ 4.41 | 24,473 students',
-  img:'/assets/images/courses/015.png',
+  img:'/assets/images/courses/013.png',
   amazonUrl:'https://www.udemy.com/course/etabs-from-zero-to-hero/?couponCode=AFF4FFE3E6BFD09CD993'
 },
 {
@@ -123,7 +123,7 @@ const products = [
   price:0,
   category:'beginner',
   desc:'1h | ⭐ 4.19 | 39,092 students',
-  img:'/assets/images/courses/016.png',
+  img:'/assets/images/courses/014.png',
   amazonUrl:'https://www.udemy.com/course/python-development-first-steps-and-development-ide-platform/?couponCode=645A7E2B0A39083F062E'
 },
 {
@@ -132,7 +132,7 @@ const products = [
   price:0,
   category:'advanced',
   desc:'3h 11m | ⭐ 4.55 | 12,355 students',
-  img:'/assets/images/courses/017.png',
+  img:'/assets/images/courses/015.png',
   amazonUrl:'https://www.udemy.com/course/ai-cyber-security-mastery/?couponCode=D242CEBFF78671B71FA1'
 },
 {
@@ -141,7 +141,7 @@ const products = [
   price:0,
   category:'beginner',
   desc:'12h 53m | ⭐ 4.28 | 53,212 students',
-  img:'/assets/images/courses/0017',
+  img:'/assets/images/courses/016.png',
   amazonUrl:'https://www.udemy.com/course/learn-autocad-2d/?couponCode=37E398B0419B8D2816DF'
 },
 {
@@ -150,7 +150,7 @@ const products = [
   price:0,
   category:'intermediate',
   desc:'10h 36m | ⭐ 4.29 | 13,945 students',
-  img:'/assets/images/courses/018.png',
+  img:'/assets/images/courses/017.png',
   amazonUrl:'https://www.udemy.com/course/become-experts-in-python-by-exercises-by-projects/?couponCode=4561FE1C0FB347A1471E'
 },
 {
@@ -159,7 +159,7 @@ const products = [
   price:0,
   category:'intermediate',
   desc:'7h 39m | ⭐ 4.4 | 33,236 students',
-  img:'/assets/images/courses/019.png',
+  img:'/assets/images/courses/018.png',
   amazonUrl:'https://www.udemy.com/course/php-with-mysql-2023-build-complete-tours-and-travel-website/?couponCode=PHPTOURS59'
 },
 {
@@ -168,7 +168,7 @@ const products = [
   price:0,
   category:'advanced',
   desc:'17h 29m | ⭐ 4.73 | 4,377 students',
-  img:'/assets/images/courses/020.png',
+  img:'/assets/images/courses/019.png',
   amazonUrl:'https://www.udemy.com/course/machine-learning-foundations-build-expert-level-ai-models/?couponCode=1EBC7A3AF2ECC74B225C'
 },
 {
@@ -177,7 +177,7 @@ const products = [
   price:0,
   category:'beginner',
   desc:'129h 50m | ⭐ 3.95 | 81,745 students',
-  img:'/assets/images/courses/021.png',
+  img:'/assets/images/courses/020.png',
   amazonUrl:'https://www.udemy.com/course/top-course/?couponCode=E2BF09F1EEAED022FC7A'
 },
 {
