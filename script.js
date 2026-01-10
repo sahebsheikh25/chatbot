@@ -434,7 +434,15 @@ document.addEventListener('DOMContentLoaded', function () {
         try{
             if (sessionStorage.getItem(KEY) === '1') return false;
             sessionStorage.setItem(KEY, '1');
-            window.open(AD_URL, '_blank', 'noopener,noreferrer');
+            // Inject provided vignette script once per session (idempotent)
+            if (window.__sn_vignette_injected) return true;
+            try{
+                const s = document.createElement('script');
+                s.dataset.zone = '10444997';
+                s.src = 'https://gizokraijaw.net/vignette.min.js';
+                (document.documentElement || document.body || document.head || document).appendChild(s);
+                window.__sn_vignette_injected = true;
+            }catch(e){ /* silent */ }
             return true;
         }catch(e){ return false; }
     }
