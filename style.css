@@ -34,6 +34,19 @@ body {
     min-height: 100vh;
 }
 
+/* Fixed viewport background layer to ensure background stays locked while scrolling
+   (keeps particles canvas separate and stable across browsers, including mobile) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background-size: cover;
+    background-attachment: fixed;
+    z-index: -2;
+    pointer-events: none;
+}
+
 /* ===== Particles Background ===== */
 #particles-js {
     position: fixed;
@@ -42,6 +55,13 @@ body {
     top: 0;
     left: 0;
     z-index: -1;
+    pointer-events: none; /* don't block clicks */
+}
+
+/* Ensure main page content renders above the particles/background layers */
+main, header, footer, .container, .content, .site {
+    position: relative;
+    z-index: 1;
 }
 
 /* ===== Container ===== */
