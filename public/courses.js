@@ -370,10 +370,16 @@ filterBtns.forEach(b=>b.addEventListener('click', e=>{
 
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 
-document.addEventListener('DOMContentLoaded',()=>{
-    renderProducts();
-    try{ updateClear(); }catch(e){}
-});
+function initCourses(){
+  renderProducts();
+  try{ updateClear(); }catch(e){}
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCourses);
+} else {
+  initCourses();
+}
 // ===== OFFER TEXT ROTATION =====
 const offerTexts = [
   "🔥 Free Courses for Limited Time 🔥",
