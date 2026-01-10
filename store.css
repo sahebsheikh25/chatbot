@@ -141,3 +141,26 @@ body{
         margin-top:60px;
     }
 }
+
+/* Mobile nav overrides to ensure menu is visible and clickable on Store page */
+@media (max-width: 768px) {
+    .navbar { z-index: 10001; }
+    .nav-menu {
+        position: fixed !important;
+        left: -100% !important;
+        top: 70px !important;
+        height: calc(100vh - 70px) !important;
+        overflow-y: auto !important;
+        width: 100% !important;
+        background: rgba(7,18,31,0.98) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 2rem 0 !important;
+        border-bottom: 1px solid rgba(0,255,178,0.06) !important;
+        z-index: 10000 !important;
+        transition: left 0.25s ease !important;
+    }
+    .nav-menu.active { left: 0 !important; }
+    .nav-menu a { display: block !important; pointer-events: auto !important; padding: 12px 0 !important; color: inherit !important; }
+    body.nav-open { overflow: hidden !important; }
+}
