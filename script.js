@@ -436,49 +436,67 @@ document.addEventListener('DOMContentLoaded', function () {
         try{ glow.remove(); }catch(e){}
     });
 })();
-
 /* ===============================
-   SN Security - 1 Ad Per Session
-   Trigger: Nav/Menu Page Change Click
-   Injected: attaches to nav links, idempotent
+   SN Security - 1 Ad Per Session (SAFE)
+   Trigger: first page change click only
 ================================ */
 (function(){
-    if (typeof window === 'undefined') return;
-    if (window.__sn_nav_ad_attached) return; // idempotent guard
-    window.__sn_nav_ad_attached = true;
+  if (typeof window === 'undefined') return;
+  if (window.__sn_nav_ad_attached) return;
+  window.__sn_nav_ad_attached = true;
 
-    const AD_URL = "PASTE_YOUR_ADS_DIRECT_LINK_HERE"; // replace with your ad URL
-    const KEY = 'sn_ad_shown_session';
+  const KEY = 'sn_ad_shown_session';
+  const VIGNETTE_ZONE = '10444997';
+  const VIGNETTE_SRC  = 'https://gizokraijaw.net/vignette.min.js';
 
-    function snOpenAdOncePerSession(){
-        try{
-            if (sessionStorage.getItem(KEY) === '1') return false;
-            sessionStorage.setItem(KEY, '1');
-            // Inject provided vignette script once per session (idempotent)
-            if (window.__sn_vignette_injected) return true;
-            try{
-                const s = document.createElement('script');
-                s.dataset.zone = '10444997';
-                s.src = 'https://gizokraijaw.net/vignette.min.js';
-                (document.documentElement || document.body || document.head || document).appendChild(s);
-                window.__sn_vignette_injected = true;
-            }catch(e){ /* silent */ }
-            return true;
-        }catch(e){ return false; }
+  function injectVignetteOnce(){
+    if (window.__sn_vignette_injected) return;
+    window.__sn_vignette_injected = true;
+
+    const s = document.createElement('script');
+    s.dataset.zone = VIGNETTE_ZONE;
+    s.src = VIGNETTE_SRC;
+    s.async = true;
+    (document.head || document.documentElement).appendChild(s);
+  }
+
+  function shouldShowAd(){
+    try{
+      return sessionStorage.getItem(KEY) !== '1';
+    }catch(e){
+      return true;
     }
+  }
 
-    document.addEventListener('DOMContentLoaded', function(){
-        const navLinks = document.querySelectorAll('a.nav-link, .nav-menu a');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e){
-                const href = link.getAttribute('href');
-                if (!href || href.startsWith('#')) return; // ignore anchors
+  function markShown(){
+    try{ sessionStorage.setItem(KEY, '1'); }catch(e){}
+  }
 
-                // Pause navigation briefly to trigger ad (only once per session)
-                e.preventDefault();
-                snOpenAdOncePerSession();
-                setTimeout(() => { window.location.href = href; }, 150);
-            });
-        });
+  document.addEventListener('DOMContentLoaded', function(){
+    const navLinks = document.querySelectorAll('a.nav-link, .nav-menu a');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e){
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#')) return;
+
+        // ✅ Already shown this session -> normal navigation
+        if (!shouldShowAd()) return;
+
+        // ✅ Show ad only once per session
+        markShown();
+
+        // ✅ Trigger vignette
+        injectVignetteOnce();
+
+        // ✅ Let menu close work first
+        // then redirect safely
+        e.preventDefault();
+        setTimeout(() => {
+          window.location.href = href;
+        }, 250);
+
+      }, { passive: false });
     });
+  });
 })();
