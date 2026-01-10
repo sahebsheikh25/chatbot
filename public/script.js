@@ -315,6 +315,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+/* Auto-load /ads.js on most pages so ad injectors run
+   - Skips About and Contact pages
+   - Idempotent guard via window.__sn_ads_loader
+*/
+(function(){
+    if (typeof window === 'undefined') return;
+    if (window.__sn_ads_loader) return; window.__sn_ads_loader = true;
+    try{
+        const path = (location.pathname.split('/').pop() || 'index.html');
+        if (/^(about|contact)\.html$/.test(path)) return; // skip
+        const s = document.createElement('script');
+        s.src = '/ads.js';
+        s.defer = true;
+        s.async = false;
+        s.onload = function(){ console.debug('ads.js loaded'); };
+        s.onerror = function(){ console.warn('Failed to load /ads.js'); };
+        (document.body || document.documentElement || document.head || document).appendChild(s);
+    }catch(e){ console.warn('ads loader error', e); }
+})();
+
 // Auto-inject chatbot widget on every page (loads chatbot.html, CSS, and JS once)
 document.addEventListener('DOMContentLoaded', async function(){
     try{
